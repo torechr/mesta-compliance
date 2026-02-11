@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Last opp dokumenter - MESTA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --orange: #FF6B35;
+            --blue: #004B87;
+            --green: #00A651;
+            --yellow: #FDB913;
+            --purple: #8B5CF6;
+            --pink: #EC4899;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            color: white;
+            padding: 2rem 1rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .welcome-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sub-text {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        /* Progress Card */
+        .progress-card {
+            background: white;
+            border-radius: 28px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            animation: slideUp 0.6s ease-out 0.2s both;
+        }
+
+        .progress-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .progress-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .progress-subtitle {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        .circular-progress {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 1.5rem;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle {
+            transition: stroke-dashoffset 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .progress-percentage {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-label {
+            font-size: 0.85rem;
+            color: #999;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* Document Cards */
+        .document-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            border-radius: 24px;
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+            border: 3px solid transparent;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            animation: slideUp 0.6s ease-out both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .document-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(139, 92, 246, 0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .document-card:hover::before {
+            opacity: 1;
+        }
+
+        .document-card.uploaded {
+            background: linear-gradient(135deg, #D1FAE5 0%, #A7F3D0 100%);
+            border-color: var(--green);
+        }
+
+        .document-card.uploading {
+            border-color: var(--purple);
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .document-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .doc-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+
+        .doc-info {
+            flex: 1;
+        }
+
+        .doc-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .doc-desc {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .status-badge.missing {
+            background: #FEE2E2;
+            color: #991B1B;
+        }
+
+        .status-badge.uploaded {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        /* Upload Button */
+        .upload-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .upload-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .upload-btn.success {
+            background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
+        }
+
+        /* File Input Hidden */
+        input[type="file"] {
+            display: none;
+        }
+
+        /* Image Preview */
+        .image-preview {
+            margin-top: 1rem;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+            animation: zoomIn 0.4s ease-out;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 16px;
+        }
+
+        .remove-image {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            width: 36px;
+            height: 36px;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .remove-image:hover {
+            background: #EF4444;
+            transform: scale(1.1);
+        }
+
+        /* Success Animation */
+        .success-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(5, 150, 105, 0.95) 100%);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .success-overlay.active {
+            display: flex;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .success-content {
+            text-align: center;
+            color: white;
+            padding: 2rem;
+            animation: successPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .success-icon {
+            font-size: 8rem;
+            margin-bottom: 1rem;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+        }
+
+        .success-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+
+        .success-message {
+            font-size: 1.2rem;
+            opacity: 0.95;
+        }
+
+        /* Confetti */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: var(--orange);
+            position: absolute;
+            animation: confetti-fall 3s linear forwards;
+        }
+
+        @keyframes confetti-fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Complete Button */
+        .complete-btn {
+            width: 100%;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--green) 0%, #059669 100%);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            font-size: 1.2rem;
+            font-weight: 800;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'Poppins', sans-serif;
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.4);
+            margin-top: 2rem;
+            transition: all 0.3s;
+            animation: slideUp 0.6s ease-out 0.8s both;
+        }
+
+        .complete-btn:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 16px 40px rgba(16, 185, 129, 0.5);
+        }
+
+        .complete-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Tip Box */
+        .tip-box {
+            background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 6px solid var(--yellow);
+            animation: slideUp 0.6s ease-out 1s both;
+        }
+
+        .tip-title {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            color: #92400E;
+        }
+
+        .tip-text {
+            color: #78350F;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes successPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* AI Chat Assistant */
+        .chat-fab {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            border: none;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .chat-fab:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5);
+        }
+
+        .chat-fab.active {
+            background: var(--error);
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            width: calc(100% - 4rem);
+            max-width: 400px;
+            max-height: 500px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            z-index: 99;
+            animation: chatSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chat-window.active {
+            display: flex;
+        }
+
+        @keyframes chatSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .chat-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .chat-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .chat-title {
+            flex: 1;
+        }
+
+        .chat-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .chat-status {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: #f8f9fa;
+        }
+
+        .chat-message {
+            margin-bottom: 1rem;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .message-bubble {
+            padding: 1rem 1.25rem;
+            border-radius: 20px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+
+        .message-bubble.assistant {
+            background: white;
+            border: 2px solid #e5e7eb;
+            margin-right: auto;
+        }
+
+        .message-bubble.user {
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message-time {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+
+        .quick-actions {
+            padding: 1rem;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .quick-action-btn {
+            width: 100%;
+            padding: 0.875rem;
+            background: var(--mesta-gray);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 0.5rem;
+            text-align: left;
+        }
+
+        .quick-action-btn:hover {
+            border-color: var(--purple);
+            background: #f8f4ff;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            background: white;
+            border-top: 2px solid #f0f0f0;
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 0.875rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+        }
+
+        .chat-input:focus {
+            outline: none;
+            border-color: var(--purple);
+        }
+
+        .chat-send-btn {
+            padding: 0.875rem 1.25rem;
+            background: linear-gradient(135deg, var(--purple) 0%, var(--pink) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .chat-send-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 4px;
+            padding: 1rem 1.25rem;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #999;
+            animation: typing 1.4s ease-in-out infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-10px); }
+        }
+
+        .demo-video {
+            margin-top: 0.75rem;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .demo-video video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .demo-placeholder {
+            aspect-ratio: 16/9;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">MESTA</div>
+            <div class="welcome-text">Hei, <span id="employeeName">...</span>!</div>
+            <div class="sub-text">Last opp dine dokumenter</div>
+        </div>
+
+        <!-- Progress Card -->
+        <div class="progress-card">
+            <div class="progress-header">
+                <div class="progress-title">Din fremgang</div>
+                <div class="progress-subtitle">
+                    <span id="uploadedCount">0</span> av <span id="totalCount">0</span> dokumenter lastet opp
+                </div>
+            </div>
+
+            <div class="circular-progress">
+                <svg class="progress-ring" width="180" height="180">
+                    <circle
+                        class="progress-ring-bg"
+                        stroke="#E5E7EB"
+                        stroke-width="12"
+                        fill="transparent"
+                        r="80"
+                        cx="90"
+                        cy="90"
+                    />
+                    <circle
+                        id="progressCircle"
+                        class="progress-ring-circle"
+                        stroke="url(#gradient)"
+                        stroke-width="12"
+                        fill="transparent"
+                        r="80"
+                        cx="90"
+                        cy="90"
+                        stroke-dasharray="502.4"
+                        stroke-dashoffset="502.4"
+                        stroke-linecap="round"
+                    />
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#EC4899;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+                <div class="progress-text">
+                    <div class="progress-percentage" id="progressPercentage">0%</div>
+                    <div class="progress-label">Fullført</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Document Cards -->
+        <div id="documentsContainer">
+            <!-- Will be populated by JavaScript -->
+        </div>
+
+        <!-- Complete Button -->
+        <button class="complete-btn" id="completeBtn" onclick="completeUpload()" disabled>
+            🎉 Fullfør - Send til MESTA
+        </button>
+
+        <!-- Tips -->
+        <div class="tip-box">
+            <div class="tip-title">💡 Tips for gode bilder</div>
+            <div class="tip-text">
+                • Ta bildet i godt lys<br>
+                • Sørg for at hele dokumentet er synlig<br>
+                • Unngå refleksjoner og skygger<br>
+                • Hold kameraet rett over dokumentet
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Overlay -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-content">
+            <div class="success-icon">🎉</div>
+            <div class="success-title">Fullført!</div>
+            <div class="success-message">
+                Alle dokumenter er lastet opp og sendt til MESTA.<br>
+                Takk for din innsats!
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Chat Assistant -->
+    <button class="chat-fab" id="chatFab" onclick="toggleChat()">
+        💬
+    </button>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <div class="chat-avatar">🤖</div>
+            <div class="chat-title">
+                <div class="chat-name">MESTA Assistent</div>
+                <div class="chat-status">Alltid klar til å hjelpe</div>
+            </div>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="chat-message">
+                <div class="message-bubble assistant">
+                    👋 Hei! Jeg er her for å hjelpe deg med å laste opp dokumenter. Har du noen spørsmål?
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-actions" id="quickActions">
+            <button class="quick-action-btn" onclick="handleQuickAction('demo')">
+                🎥 Vis meg hvordan jeg tar et godt bilde
+            </button>
+            <button class="quick-action-btn" onclick="handleQuickAction('camera')">
+                📸 Kameraet mitt fungerer ikke
+            </button>
+            <button class="quick-action-btn" onclick="handleQuickAction('quality')">
+                ✨ Hvordan tar jeg et godt bilde?
+            </button>
+            <button class="quick-action-btn" onclick="handleQuickAction('document')">
+                📄 Hvilket dokument skal jeg laste opp?
+            </button>
+        </div>
+
+        <div class="chat-input-area">
+            <input type="text" class="chat-input" id="chatInput" 
+                   placeholder="Skriv din melding..." 
+                   onkeypress="handleChatKeyPress(event)">
+            <button class="chat-send-btn" onclick="sendChatMessage()">
+                ➤
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Mock data - would come from URL parameter in production
+        const employeeData = {
+            name: 'Ola Nordmann',
+            documents: [
+                { id: 'doc1', type: 'DRIVERS_LICENSE', name: 'Førerkort', icon: '🚗', description: 'Last opp bilde av førerkortet ditt', uploaded: false, file: null },
+                { id: 'doc2', type: 'HMS_COURSE', name: 'HMS-kurs', icon: '🦺', description: 'Bevis på gjennomført HMS-opplæring', uploaded: false, file: null },
+                { id: 'doc3', type: 'MACHINERY_CERT', name: 'Maskinførerbevis', icon: '🚜', description: 'Sertifikat for maskinføring', uploaded: false, file: null }
+            ]
+        };
+
+        let uploadedCount = 0;
+        let totalCount = employeeData.documents.length;
+
+        // Initialize
+        document.getElementById('employeeName').textContent = employeeData.name;
+        document.getElementById('totalCount').textContent = totalCount;
+        
+        renderDocuments();
+        updateProgress();
+
+        function renderDocuments() {
+            const container = document.getElementById('documentsContainer');
+            container.innerHTML = employeeData.documents.map((doc, index) => `
+                <div class="document-card ${doc.uploaded ? 'uploaded' : ''}" id="card-${doc.id}" 
+                     style="animation-delay: ${0.4 + index * 0.1}s;">
+                    <div class="document-header">
+                        <div class="doc-icon">${doc.icon}</div>
+                        <div class="doc-info">
+                            <div class="doc-name">${doc.name}</div>
+                            <div class="doc-desc">${doc.description}</div>
+                        </div>
+                        <div class="status-badge ${doc.uploaded ? 'uploaded' : 'missing'}">
+                            ${doc.uploaded ? '✓ Lastet opp' : 'Mangler'}
+                        </div>
+                    </div>
+                    
+                    ${doc.uploaded ? `
+                        <div class="image-preview">
+                            <img src="${doc.preview}" alt="${doc.name}">
+                            <div class="remove-image" onclick="removeImage('${doc.id}')">✕</div>
+                        </div>
+                    ` : `
+                        <input type="file" id="file-${doc.id}" accept="image/*" capture="environment" 
+                               onchange="handleFileSelect('${doc.id}', event)">
+                        <button class="upload-btn" onclick="document.getElementById('file-${doc.id}').click()">
+                            📸 Ta bilde eller last opp
+                        </button>
+                    `}
+                </div>
+            `).join('');
+        }
+
+        function handleFileSelect(docId, event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Show uploading state
+            const card = document.getElementById(`card-${docId}`);
+            card.classList.add('uploading');
+
+            // Simulate upload delay
+            setTimeout(() => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const doc = employeeData.documents.find(d => d.id === docId);
+                    doc.uploaded = true;
+                    doc.preview = e.target.result;
+                    doc.file = file;
+
+                    uploadedCount++;
+                    
+                    renderDocuments();
+                    updateProgress();
+                    celebrateUpload();
+
+                    // Check if all documents are uploaded
+                    if (uploadedCount === totalCount) {
+                        enableCompleteButton();
+                    }
+                };
+                reader.readAsDataURL(file);
+            }, 800);
+        }
+
+        function removeImage(docId) {
+            const doc = employeeData.documents.find(d => d.id === docId);
+            doc.uploaded = false;
+            doc.preview = null;
+            doc.file = null;
+
+            uploadedCount--;
+            
+            renderDocuments();
+            updateProgress();
+            disableCompleteButton();
+        }
+
+        function updateProgress() {
+            const percentage = Math.round((uploadedCount / totalCount) * 100);
+            const circumference = 2 * Math.PI * 80;
+            const offset = circumference - (percentage / 100) * circumference;
+
+            document.getElementById('progressPercentage').textContent = percentage + '%';
+            document.getElementById('uploadedCount').textContent = uploadedCount;
+            document.getElementById('progressCircle').style.strokeDashoffset = offset;
+        }
+
+        function celebrateUpload() {
+            // Create confetti
+            for (let i = 0; i < 30; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.background = ['#FF6B35', '#8B5CF6', '#EC4899', '#FDB913', '#00A651'][Math.floor(Math.random() * 5)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 50);
+            }
+
+            // Haptic feedback (if supported)
+            if (navigator.vibrate) {
+                navigator.vibrate([50, 100, 50]);
+            }
+        }
+
+        function enableCompleteButton() {
+            const btn = document.getElementById('completeBtn');
+            btn.disabled = false;
+            btn.style.animation = 'pulse 1.5s ease-in-out infinite';
+        }
+
+        function disableCompleteButton() {
+            const btn = document.getElementById('completeBtn');
+            btn.disabled = true;
+            btn.style.animation = 'none';
+        }
+
+        function completeUpload() {
+            // Show success overlay
+            document.getElementById('successOverlay').classList.add('active');
+
+            // More confetti!
+            for (let i = 0; i < 100; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.className = 'confetti';
+                    confetti.style.left = Math.random() * window.innerWidth + 'px';
+                    confetti.style.background = ['#FF6B35', '#8B5CF6', '#EC4899', '#FDB913', '#00A651'][Math.floor(Math.random() * 5)];
+                    confetti.style.animationDelay = Math.random() * 0.5 + 's';
+                    document.body.appendChild(confetti);
+                    
+                    setTimeout(() => confetti.remove(), 3000);
+                }, i * 20);
+            }
+
+            // Haptic celebration
+            if (navigator.vibrate) {
+                navigator.vibrate([100, 50, 100, 50, 200]);
+            }
+
+            // In production: Send data to server
+            console.log('Sending documents to server:', employeeData);
+
+            // Redirect after 3 seconds
+            setTimeout(() => {
+                alert('✅ Dokumenter sendt!\n\nTakk for din innsats. Du vil motta bekreftelse på e-post.');
+                // window.location.href = '/takk';
+            }, 3000);
+        }
+
+        // Prevent accidental page refresh
+        window.addEventListener('beforeunload', (e) => {
+            if (uploadedCount > 0 && uploadedCount < totalCount) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
+
+        // AI Chat Assistant
+        let chatOpen = false;
+
+        function toggleChat() {
+            chatOpen = !chatOpen;
+            const chatWindow = document.getElementById('chatWindow');
+            const chatFab = document.getElementById('chatFab');
+            
+            if (chatOpen) {
+                chatWindow.classList.add('active');
+                chatFab.classList.add('active');
+                chatFab.textContent = '✕';
+                
+                // Scroll to bottom
+                scrollChatToBottom();
+            } else {
+                chatWindow.classList.remove('active');
+                chatFab.classList.remove('active');
+                chatFab.textContent = '💬';
+            }
+        }
+
+        function handleQuickAction(action) {
+            // Hide quick actions after first use
+            document.getElementById('quickActions').style.display = 'none';
+            
+            const responses = {
+                'demo': {
+                    message: 'Jeg viser deg en demo! Her er hvordan du tar et perfekt bilde:',
+                    hasDemo: true
+                },
+                'camera': {
+                    message: 'Kameraproblemer? Her er noen løsninger:\n\n1. Sjekk at du har gitt nettleseren tillatelse til kamera\n2. Prøv å oppdatere siden (dra ned fra toppen)\n3. Prøv å bruke "Last opp fil" i stedet for kamera\n4. Sjekk at ingen andre apper bruker kameraet',
+                    hasDemo: false
+                },
+                'quality': {
+                    message: '✨ Tips for perfekte bilder:\n\n📍 Hold telefonen rett over dokumentet\n💡 Bruk godt lys (gjerne dagslys)\n🔲 Sørg for at hele dokumentet er synlig\n🚫 Unngå refleksjoner og skygger\n📐 Hold telefonen stabilt',
+                    hasDemo: false
+                },
+                'document': {
+                    message: `Du skal laste opp:\n\n${employeeData.documents.map((doc, i) => `${i + 1}. ${doc.icon} ${doc.name}\n   ${doc.description}`).join('\n\n')}\n\nLast opp ett om gangen!`,
+                    hasDemo: false
+                }
+            };
+
+            const response = responses[action];
+            
+            addChatMessage(response.message, 'assistant');
+            
+            if (response.hasDemo) {
+                setTimeout(() => {
+                    addDemoVideo();
+                }, 500);
+            }
+        }
+
+        function addChatMessage(text, sender = 'user') {
+            const messagesContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            const now = new Date().toLocaleTimeString('no-NO', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="message-bubble ${sender}">
+                    ${text.replace(/\n/g, '<br>')}
+                </div>
+                <div class="message-time">${now}</div>
+            `;
+            
+            messagesContainer.appendChild(messageDiv);
+            scrollChatToBottom();
+        }
+
+        function addDemoVideo() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const videoDiv = document.createElement('div');
+            videoDiv.className = 'chat-message';
+            
+            videoDiv.innerHTML = `
+                <div class="message-bubble assistant">
+                    <strong>📹 Demonstrasjon: Ta et godt bilde</strong>
+                    <div class="demo-video">
+                        <div class="demo-placeholder" onclick="playDemo()">
+                            <div style="text-align: center;">
+                                <div style="font-size: 4rem; margin-bottom: 0.5rem;">▶️</div>
+                                <div style="font-size: 1rem; opacity: 0.9;">Trykk for å spille av</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.75rem; font-size: 0.9rem; color: #666;">
+                        <strong>Steg for steg:</strong><br>
+                        1️⃣ Legg dokumentet på et flatt underlag<br>
+                        2️⃣ Hold telefonen 20-30 cm over<br>
+                        3️⃣ Sørg for jevnt lys uten refleksjoner<br>
+                        4️⃣ Ta bildet når alt er tydelig<br>
+                        5️⃣ Sjekk at alt er leselig før du sender
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(videoDiv);
+            scrollChatToBottom();
+        }
+
+        function playDemo() {
+            alert('🎥 Demo-video:\n\nI en produksjonsversjon ville dette være en kort video som viser:\n\n1. Hvordan holde telefonen over dokumentet\n2. Riktig avstand og vinkel\n3. Hvordan sjekke at bildet er skarpt\n4. Eksempel på godt vs. dårlig bilde\n\nFor nå: Følg stegene under videoen! 👇');
+        }
+
+        function showTypingIndicator() {
+            const messagesContainer = document.getElementById('chatMessages');
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'chat-message';
+            typingDiv.id = 'typingIndicator';
+            
+            typingDiv.innerHTML = `
+                <div class="message-bubble assistant">
+                    <div class="typing-indicator">
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                        <div class="typing-dot"></div>
+                    </div>
+                </div>
+            `;
+            
+            messagesContainer.appendChild(typingDiv);
+            scrollChatToBottom();
+        }
+
+        function removeTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            addChatMessage(message, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            
+            // Simulate AI response
+            setTimeout(() => {
+                removeTypingIndicator();
+                
+                // Simple keyword-based responses
+                const lowerMessage = message.toLowerCase();
+                let response = '';
+                
+                if (lowerMessage.includes('kamera') || lowerMessage.includes('camera')) {
+                    response = '📸 Kameraproblemer?\n\n1. Sjekk at du har gitt tillatelse til kamera\n2. Lukk andre apper som bruker kameraet\n3. Prøv å oppdatere siden\n4. Bruk "Last opp fil" i stedet';
+                } else if (lowerMessage.includes('bilde') || lowerMessage.includes('foto')) {
+                    response = '✨ For å ta et godt bilde:\n\n• Bruk godt lys (dagslys er best)\n• Hold telefonen rett over dokumentet\n• Sørg for at hele dokumentet er synlig\n• Unngå skygger og refleksjoner\n\nVil du se en demo?';
+                } else if (lowerMessage.includes('hjelp') || lowerMessage.includes('help')) {
+                    response = '🤝 Jeg kan hjelpe deg med:\n\n📸 Hvordan ta gode bilder\n🔧 Tekniske problemer\n📄 Hvilke dokumenter du trenger\n✨ Tips og triks\n\nHva trenger du hjelp til?';
+                } else if (lowerMessage.includes('dokument')) {
+                    response = `Du skal laste opp følgende dokumenter:\n\n${employeeData.documents.map((doc, i) => `${i + 1}. ${doc.icon} ${doc.name}`).join('\n')}\n\nTa ett dokument om gangen!`;
+                } else if (lowerMessage.includes('ferdig') || lowerMessage.includes('klar')) {
+                    response = `Fantastisk! 🎉\n\nDu har lastet opp ${uploadedCount} av ${totalCount} dokumenter.\n\n${uploadedCount === totalCount ? 'Du er ferdig! Trykk på "Fullfør"-knappen nederst.' : 'Fortsett med de resterende dokumentene!'}`;
+                } else if (lowerMessage.includes('takk')) {
+                    response = '😊 Bare hyggelig! Lykke til med opplastingen!';
+                } else {
+                    response = '🤔 Jeg forstår ikke helt, men jeg kan hjelpe deg med:\n\n📸 Ta gode bilder\n🔧 Løse tekniske problemer\n📄 Finne riktige dokumenter\n\nHva kan jeg hjelpe deg med?';
+                }
+                
+                addChatMessage(response, 'assistant');
+            }, 1000 + Math.random() * 1000);
+        }
+
+        function handleChatKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendChatMessage();
+            }
+        }
+
+        function scrollChatToBottom() {
+            const messagesContainer = document.getElementById('chatMessages');
+            setTimeout(() => {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 100);
+        }
+
+        console.log('📱 Mobile Upload Page Ready');
+        console.log('Employee:', employeeData.name);
+        console.log('Documents to upload:', totalCount);
+    </script>
+</body>
+</html>

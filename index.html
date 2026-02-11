@@ -1,0 +1,3265 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MESTA Compliance</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --mesta-orange: #FF6B35;
+            --mesta-blue: #004B87;
+            --mesta-green: #00A651;
+            --mesta-yellow: #FDB913;
+            --mesta-gray: #F5F5F5;
+            --mesta-dark: #1A1A1A;
+            --white: #FFFFFF;
+            --success: #00A651;
+            --warning: #FDB913;
+            --error: #E31E24;
+            --shadow: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--mesta-dark);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--mesta-blue) 0%, #003366 100%);
+            padding: 2rem;
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            max-width: 480px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--mesta-orange);
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .login-subtitle {
+            color: #666;
+            margin-bottom: 2.5rem;
+            font-size: 1.1rem;
+        }
+
+        .role-cards {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .role-card {
+            background: linear-gradient(135deg, var(--mesta-gray) 0%, #e8e8e8 100%);
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 2rem 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-align: left;
+        }
+
+        .role-card:hover {
+            transform: translateY(-6px) scale(1.02);
+            border-color: var(--mesta-orange);
+            box-shadow: 0 12px 32px rgba(255, 107, 53, 0.3);
+        }
+
+        .role-card.admin {
+            background: linear-gradient(135deg, #FFE5D9 0%, #FFD4C4 100%);
+        }
+
+        .role-card.pm {
+            background: linear-gradient(135deg, #D4E4F7 0%, #C2D9F0 100%);
+        }
+
+        .role-card.ue {
+            background: linear-gradient(135deg, #D4F7E4 0%, #C2F0D9 100%);
+        }
+
+        .role-icon {
+            font-size: 3rem;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .role-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .role-desc {
+            font-size: 0.95rem;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        /* App Container */
+        .app-container {
+            display: none;
+        }
+
+        .app-container.active {
+            display: block;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: white;
+            padding: 1.5rem 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .top-bar-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--mesta-orange);
+            letter-spacing: -0.02em;
+        }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: var(--mesta-gray);
+            padding: 0.75rem 1.5rem;
+            border-radius: 100px;
+            transition: all 0.2s;
+        }
+
+        .user-badge:hover {
+            background: #e8e8e8;
+        }
+
+        .user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            transition: all 0.2s;
+            border-radius: 8px;
+        }
+
+        .logout-btn:hover {
+            color: var(--error);
+            background: #fee;
+        }
+
+        /* Main Content */
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Action Cards */
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .big-action-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 3px solid transparent;
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .big-action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.1) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .big-action-card:hover::before {
+            opacity: 1;
+        }
+
+        .big-action-card:hover {
+            transform: translateY(-12px) scale(1.03);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--mesta-orange);
+        }
+
+        .big-action-card.primary {
+            background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%);
+            color: white;
+        }
+
+        .big-action-card.secondary {
+            background: linear-gradient(135deg, var(--mesta-blue) 0%, #003366 100%);
+            color: white;
+        }
+
+        .big-action-card.success {
+            background: linear-gradient(135deg, var(--mesta-green) 0%, #008C42 100%);
+            color: white;
+        }
+
+        .action-icon {
+            font-size: 4.5rem;
+            margin-bottom: 1.25rem;
+            display: block;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+        }
+
+        .action-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.01em;
+        }
+
+        .action-desc {
+            font-size: 1rem;
+            opacity: 0.9;
+            line-height: 1.5;
+        }
+
+        /* Status Overview */
+        .status-overview {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-icon {
+            font-size: 2.5rem;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .status-item {
+            text-align: center;
+            padding: 2rem 1.5rem;
+            background: var(--mesta-gray);
+            border-radius: 20px;
+            border: 3px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .status-item:hover {
+            border-color: var(--mesta-orange);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow);
+        }
+
+        .status-number {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, var(--mesta-orange) 0%, var(--mesta-blue) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .status-label {
+            font-size: 1rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+        }
+
+        /* UE List */
+        .ue-list {
+            background: white;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .list-item {
+            background: var(--mesta-gray);
+            border-radius: 20px;
+            padding: 1.75rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 3px solid transparent;
+        }
+
+        .list-item:hover {
+            transform: translateX(12px);
+            border-color: var(--mesta-orange);
+            box-shadow: var(--shadow);
+        }
+
+        .list-item-info {
+            flex: 1;
+        }
+
+        .list-item-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--mesta-dark);
+        }
+
+        .list-item-meta {
+            font-size: 0.95rem;
+            color: #666;
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-badge {
+            padding: 0.6rem 1.5rem;
+            border-radius: 100px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            white-space: nowrap;
+        }
+
+        .status-badge.ok {
+            background: var(--success);
+            color: white;
+        }
+
+        .status-badge.warning {
+            background: var(--warning);
+            color: var(--mesta-dark);
+        }
+
+        .status-badge.error {
+            background: var(--error);
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 28px;
+            max-width: 700px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+            animation: modalSlideUp 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes modalSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .modal-header {
+            padding: 2.5rem;
+            border-bottom: 2px solid var(--mesta-gray);
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--mesta-dark);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .modal-body {
+            padding: 2.5rem;
+        }
+
+        /* Form Elements */
+        .form-field {
+            margin-bottom: 1.75rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            font-size: 1.05rem;
+            color: var(--mesta-dark);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            border: 3px solid var(--mesta-gray);
+            border-radius: 16px;
+            font-size: 1.05rem;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--mesta-orange);
+            box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .big-button {
+            width: 100%;
+            padding: 1.5rem;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .big-button.primary {
+            background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%);
+            color: white;
+            box-shadow: 0 6px 16px rgba(255, 107, 53, 0.3);
+        }
+
+        .big-button.primary:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 28px rgba(255, 107, 53, 0.4);
+        }
+
+        .big-button.secondary {
+            background: var(--mesta-gray);
+            color: var(--mesta-dark);
+        }
+
+        .big-button.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            padding: 2rem;
+            background: var(--mesta-gray);
+            border-radius: 20px;
+        }
+
+        .progress-step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+
+        .progress-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 24px;
+            right: -50%;
+            width: 100%;
+            height: 4px;
+            background: #ddd;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active::after,
+        .progress-step.completed::after {
+            background: var(--mesta-orange);
+        }
+
+        .step-circle {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #ddd;
+            margin: 0 auto 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s;
+        }
+
+        .progress-step.active .step-circle {
+            background: var(--mesta-orange);
+            color: white;
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+
+        .progress-step.completed .step-circle {
+            background: var(--success);
+            color: white;
+        }
+
+        .step-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #999;
+        }
+
+        .progress-step.active .step-label {
+            color: var(--mesta-orange);
+            font-weight: 700;
+        }
+
+        .progress-step.completed .step-label {
+            color: var(--success);
+        }
+
+        /* Search Results */
+        .search-result-card {
+            background: white;
+            border: 3px solid var(--mesta-gray);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .search-result-card:hover {
+            border-color: var(--mesta-orange);
+            transform: translateX(8px);
+            box-shadow: var(--shadow);
+        }
+
+        .search-result-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .search-result-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Employee Cards */
+        .employee-card {
+            background: white;
+            border: 3px solid var(--mesta-gray);
+            border-radius: 20px;
+            padding: 1.75rem;
+            margin-bottom: 1.25rem;
+            transition: all 0.2s;
+        }
+
+        .employee-card:hover {
+            border-color: var(--mesta-blue);
+            box-shadow: var(--shadow);
+        }
+
+        .employee-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.25rem;
+        }
+
+        .employee-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .employee-role {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .doc-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .doc-badge.complete {
+            background: var(--success);
+            color: white;
+        }
+
+        .doc-badge.incomplete {
+            background: var(--warning);
+            color: var(--mesta-dark);
+        }
+
+        .doc-badge.missing {
+            background: var(--error);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+
+        /* Loading */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(8px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            flex-direction: column;
+        }
+
+        .loading-overlay.active {
+            display: flex;
+        }
+
+        .loading-spinner {
+            width: 70px;
+            height: 70px;
+            border: 6px solid var(--mesta-gray);
+            border-top-color: var(--mesta-orange);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            margin-top: 1.5rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--mesta-dark);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Success Message */
+        .success-message {
+            text-align: center;
+            padding: 3rem 2rem;
+        }
+
+        .success-icon {
+            font-size: 6rem;
+            margin-bottom: 1.5rem;
+            animation: successPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes successPop {
+            0% {
+                transform: scale(0);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .success-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--success);
+        }
+
+        .success-desc {
+            font-size: 1.15rem;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* Checkbox Group */
+        .checkbox-group {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: white;
+            border: 3px solid var(--mesta-gray);
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-item:hover {
+            border-color: var(--mesta-orange);
+            background: #fffaf8;
+        }
+
+        .checkbox-item input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            accent-color: var(--mesta-orange);
+        }
+
+        .checkbox-label {
+            flex: 1;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+
+            .action-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .status-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .top-bar {
+                padding: 1rem 1.5rem;
+            }
+
+            .modal-box {
+                margin: 1rem;
+            }
+
+            .list-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .list-item-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+
+        /* Add Employee Button */
+        .add-employee-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--mesta-green) 0%, #008C42 100%);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1.5rem;
+        }
+
+        .add-employee-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 166, 81, 0.3);
+        }
+
+        /* SMS Status */
+        .sms-status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-top: 0.75rem;
+        }
+
+        .sms-status-badge.sent {
+            background: #D1FAE5;
+            color: var(--success);
+        }
+
+        .sms-status-badge.pending {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .sms-status-badge.reminder {
+            background: #FEE2E2;
+            color: var(--error);
+        }
+    </style>
+</head>
+<body>
+    <!-- Onboarding Overlay -->
+    <div class="onboarding-overlay" id="onboardingOverlay" style="display: none;">
+        <div class="onboarding-container" style="max-width: 900px; width: 90%; height: 90vh; display: flex; flex-direction: column;">
+            <div class="onboarding-video" style="background: #000; border-radius: 20px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,0.5); flex: 1; display: flex; flex-direction: column; position: relative;">
+                <div class="onboarding-header" style="background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%); padding: 1.5rem 2rem; display: flex; align-items: center; justify-content: space-between;">
+                    <div style="font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 1rem; color: white;">
+                        <span>🎓</span>
+                        <span>Velkommen til MESTA Compliance</span>
+                    </div>
+                    <button onclick="closeOnboarding()" style="background: rgba(255,255,255,0.2); border: none; width: 40px; height: 40px; border-radius: 50%; color: white; font-size: 1.5rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">✕</button>
+                </div>
+                
+                <div class="onboarding-slides" style="flex: 1; position: relative; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);">
+                    <div class="onboarding-slide active" data-slide="0" style="position: absolute; inset: 0; padding: 3rem; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
+                        <div style="font-size: 6rem; margin-bottom: 2rem; animation: bounce 2s ease-in-out infinite;">👋</div>
+                        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; background: linear-gradient(135deg, var(--mesta-orange) 0%, var(--yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Velkommen!</h1>
+                        <p style="font-size: 1.2rem; line-height: 1.6; color: #ccc; max-width: 600px; margin-bottom: 2rem;">
+                            MESTA Compliance gjør det enkelt å administrere underentreprenører, ansatte og dokumenter. La oss vise deg hvordan på 2 minutter!
+                        </p>
+                    </div>
+                    
+                    <div class="onboarding-slide" data-slide="1" style="position: absolute; inset: 0; padding: 3rem; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
+                        <div style="font-size: 6rem; margin-bottom: 2rem;">🎯</div>
+                        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; background: linear-gradient(135deg, var(--mesta-orange) 0%, var(--yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Hva kan du gjøre?</h1>
+                        <div style="text-align: left; max-width: 500px; width: 100%;">
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 1rem;">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">✓</div>
+                                <div style="flex: 1; font-size: 1.1rem;">Legge til og administrere bedrifter</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 1rem;">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">✓</div>
+                                <div style="flex: 1; font-size: 1.1rem;">Se compliance-status i sanntid</div>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 12px; margin-bottom: 1rem;">
+                                <div style="width: 32px; height: 32px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">✓</div>
+                                <div style="flex: 1; font-size: 1.1rem;">Eksportere rapporter til Excel</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="onboarding-slide" data-slide="2" style="position: absolute; inset: 0; padding: 3rem; display: none; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
+                        <div style="font-size: 6rem; margin-bottom: 2rem; animation: pulse 2s ease-in-out infinite;">🚀</div>
+                        <h1 style="font-size: 2.5rem; font-weight: 800; margin-bottom: 1rem; background: linear-gradient(135deg, var(--mesta-orange) 0%, var(--yellow) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Du er klar!</h1>
+                        <p style="font-size: 1.2rem; line-height: 1.6; color: #ccc; max-width: 600px; margin-bottom: 2rem;">
+                            Klikk "Start" for å begynne å bruke systemet. Du kan se denne guiden igjen når som helst fra innstillinger.
+                        </p>
+                        <label style="display: flex; align-items: center; gap: 1rem; cursor: pointer; margin-top: 2rem;">
+                            <input type="checkbox" id="dontShowAgain" style="width: 24px; height: 24px; cursor: pointer;">
+                            <span style="font-size: 1rem; color: #ccc;">Ikke vis denne guiden igjen</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="onboarding-controls" style="background: #1a1a1a; padding: 2rem; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #333;">
+                    <div style="display: flex; gap: 0.75rem;">
+                        <div class="onboarding-dot active" onclick="goToOnboardingSlide(0)" style="width: 12px; height: 12px; border-radius: 50%; background: var(--mesta-orange); width: 32px; border-radius: 6px; transition: all 0.3s; cursor: pointer;"></div>
+                        <div class="onboarding-dot" onclick="goToOnboardingSlide(1)" style="width: 12px; height: 12px; border-radius: 50%; background: #555; transition: all 0.3s; cursor: pointer;"></div>
+                        <div class="onboarding-dot" onclick="goToOnboardingSlide(2)" style="width: 12px; height: 12px; border-radius: 50%; background: #555; transition: all 0.3s; cursor: pointer;"></div>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button id="onboardingPrev" onclick="prevOnboardingSlide()" disabled style="padding: 0.75rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 700; border: none; cursor: pointer; background: #333; color: white; font-family: 'Poppins', sans-serif;">← Forrige</button>
+                        <button id="onboardingNext" onclick="nextOnboardingSlide()" style="padding: 0.75rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 700; border: none; cursor: pointer; background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%); color: white; font-family: 'Poppins', sans-serif; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);">Neste →</button>
+                        <button id="onboardingStart" onclick="completeOnboardingFlow()" style="display: none; padding: 0.75rem 2rem; border-radius: 12px; font-size: 1rem; font-weight: 700; border: none; cursor: pointer; background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%); color: white; font-family: 'Poppins', sans-serif; box-shadow: 0 4px 12px rgba(255, 107, 53, 0.3);">🚀 Start</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+        <div class="loading-text" id="loadingText">Laster...</div>
+    </div>
+
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-box">
+            <div class="logo">MESTA</div>
+            <p class="login-subtitle">Velg din rolle for å fortsette</p>
+            
+            <div class="role-cards">
+                <div class="role-card admin" onclick="quickLogin('admin')">
+                    <span class="role-icon">👨‍💼</span>
+                    <div class="role-name">Administrator</div>
+                    <div class="role-desc">Full tilgang til alle funksjoner og innstillinger</div>
+                </div>
+                
+                <div class="role-card pm" onclick="quickLogin('prosjektleder')">
+                    <span class="role-icon">📊</span>
+                    <div class="role-name">Prosjektleder</div>
+                    <div class="role-desc">Administrer og evaluer underentreprenører</div>
+                </div>
+                
+                <div class="role-card ue" onclick="quickLogin('ue')">
+                    <span class="role-icon">🏢</span>
+                    <div class="role-name">Underentreprenør</div>
+                    <div class="role-desc">Se din bedrifts status og ansatte</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="appContainer">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-logo">MESTA</div>
+            <div class="user-badge">
+                <div class="user-avatar" id="userAvatar">A</div>
+                <div>
+                    <div style="font-weight: 700; font-size: 0.95rem;" id="userName">Admin</div>
+                    <div style="font-size: 0.8rem; color: #666;" id="userRole">Administrator</div>
+                </div>
+                <button class="logout-btn" onclick="logout()" title="Logg ut">🚪</button>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Admin/PM View -->
+            <div id="adminView" class="hidden">
+                <div class="action-grid fade-in">
+                    <div class="big-action-card primary" onclick="showAddUEModal()">
+                        <span class="action-icon">➕</span>
+                        <div class="action-title">Legg til bedrift</div>
+                        <div class="action-desc">Søk og registrer ny underentreprenør</div>
+                    </div>
+                    
+                    <div class="big-action-card secondary" onclick="scrollToList()">
+                        <span class="action-icon">📋</span>
+                        <div class="action-title">Se oversikt</div>
+                        <div class="action-desc">Alle registrerte bedrifter</div>
+                    </div>
+                    
+                    <div class="big-action-card success admin-only" onclick="showSettingsModal()">
+                        <span class="action-icon">⚙️</span>
+                        <div class="action-title">Innstillinger</div>
+                        <div class="action-desc">API og systemkonfigurasjon</div>
+                    </div>
+                </div>
+
+                <div class="status-overview slide-up">
+                    <div class="section-header">
+                        <span class="section-icon">📊</span>
+                        <h2 class="section-title">Oversikt</h2>
+                    </div>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-number" id="statTotal">7</div>
+                            <div class="status-label">Totalt bedrifter</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number" id="statActive" style="-webkit-text-fill-color: var(--success);">5</div>
+                            <div class="status-label">Godkjente</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number" id="statBlocked" style="-webkit-text-fill-color: var(--error);">2</div>
+                            <div class="status-label">Sperret</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number" id="statEmployees">10</div>
+                            <div class="status-label">Ansatte totalt</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ue-list slide-up" id="ueListContainer">
+                    <div class="section-header">
+                        <span class="section-icon">🏢</span>
+                        <h2 class="section-title">Registrerte bedrifter</h2>
+                    </div>
+                    
+                    <!-- Contract Filter -->
+                    <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <label style="font-weight: 600; color: var(--mesta-dark);">
+                            📋 Filtrer etter kontrakt:
+                        </label>
+                        <select id="contractFilter" onchange="filterByContract()" 
+                                style="flex: 1; min-width: 200px; padding: 0.75rem 1rem; border: 3px solid var(--mesta-gray); border-radius: 12px; font-size: 1rem; font-family: 'Poppins', sans-serif; background: white; cursor: pointer; transition: all 0.2s;">
+                            <option value="all">Alle kontrakter</option>
+                        </select>
+                        <button class="big-button primary" onclick="exportOverviewToExcel()" 
+                                style="padding: 0.75rem 1.5rem; font-size: 0.95rem; white-space: nowrap;">
+                            📊 Eksporter oversikt til Excel
+                        </button>
+                    </div>
+                    
+                    <div id="filterStats" style="color: #666; font-size: 0.9rem; font-weight: 600; margin-bottom: 1rem;">
+                        <!-- Will show filtered count -->
+                    </div>
+                    
+                    <div id="ueListContent">
+                        <!-- Will be populated -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- UE View -->
+            <div id="ueView" class="hidden">
+                <div id="ueStatusContent">
+                    <!-- Will be populated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add UE Modal -->
+    <div class="modal" id="addUEModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <span>➕</span>
+                    <span>Legg til bedrift</span>
+                </h2>
+            </div>
+            <div class="modal-body">
+                <div class="progress-steps">
+                    <div class="progress-step active" id="step1">
+                        <div class="step-circle">1</div>
+                        <div class="step-label">Søk</div>
+                    </div>
+                    <div class="progress-step" id="step2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Bekreft</div>
+                    </div>
+                    <div class="progress-step" id="step3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">✓</div>
+                    </div>
+                </div>
+
+                <!-- Step 1: Search -->
+                <div id="searchStep">
+                    <div class="form-field">
+                        <label class="form-label">🔍 Søk etter bedrift</label>
+                        <input type="text" class="form-input" id="companySearchInput" 
+                               placeholder="Skriv firmanavn eller organisasjonsnummer...">
+                    </div>
+                    <button class="big-button primary" onclick="searchCompany()">Søk i Proff.no</button>
+                    
+                    <div style="text-align: center; margin: 1.5rem 0;">
+                        <span style="color: #999; font-size: 0.9rem; font-weight: 600;">ELLER</span>
+                    </div>
+                    
+                    <button class="big-button secondary" onclick="showManualEntry('')" style="border: 3px dashed var(--mesta-blue);">
+                        ✏️ Registrer manuelt
+                    </button>
+                    
+                    <div id="searchResults" style="margin-top: 1.5rem;">
+                        <!-- Results here -->
+                    </div>
+                </div>
+
+                <!-- Step 2: Confirm -->
+                <div id="confirmStep" class="hidden">
+                    <div id="confirmContent"></div>
+                </div>
+
+                <!-- Step 3: Complete -->
+                <div id="completeStep" class="hidden">
+                    <div class="success-message">
+                        <div class="success-icon">✅</div>
+                        <h2 class="success-title">Bedrift lagt til!</h2>
+                        <p class="success-desc" id="successCompanyName"></p>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button class="big-button secondary" onclick="closeAddUEModal()" style="flex: 1;">Lukk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UE Details Modal -->
+    <div class="modal" id="ueDetailsModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 class="modal-title" id="ueDetailsTitle">
+                    <span>🏢</span>
+                    <span>Bedriftsdetaljer</span>
+                </h2>
+            </div>
+            <div class="modal-body" id="ueDetailsContent">
+                <!-- Will be populated -->
+            </div>
+            <div style="padding: 0 2.5rem 2.5rem;">
+                <button class="big-button secondary" onclick="closeUEDetailsModal()">Lukk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Employee Modal -->
+    <div class="modal" id="addEmployeeModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <span>👤</span>
+                    <span>Legg til ansatt</span>
+                </h2>
+            </div>
+            <div class="modal-body">
+                <form id="employeeForm">
+                    <div class="form-field">
+                        <label class="form-label">👤 Navn</label>
+                        <input type="text" class="form-input" id="empName" 
+                               placeholder="F.eks. Ola Nordmann" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">💼 Stilling</label>
+                        <input type="text" class="form-input" id="empRole" 
+                               placeholder="F.eks. Gravemaskinfører" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">📱 Mobilnummer</label>
+                        <input type="tel" class="form-input" id="empPhone" 
+                               placeholder="+47 XXX XX XXX" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">📧 E-post</label>
+                        <input type="email" class="form-input" id="empEmail" 
+                               placeholder="ola@example.com" required>
+                    </div>
+                    <div class="form-field">
+                        <label class="form-label">📄 Påkrevd dokumentasjon</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="docType" value="DRIVERS_LICENSE" checked>
+                                <span class="checkbox-label">🚗 Førerkort</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="docType" value="HMS_COURSE" checked>
+                                <span class="checkbox-label">🦺 HMS-opplæring</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="docType" value="MACHINERY_CERT">
+                                <span class="checkbox-label">🚜 Maskinførerbevis</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="docType" value="TRADE_CERT">
+                                <span class="checkbox-label">🎓 Fagbrev</span>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="big-button primary">📤 Send SMS og legg til</button>
+                    <button type="button" class="big-button secondary" onclick="closeEmployeeModal()" style="margin-top: 1rem;">Avbryt</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal" id="settingsModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <span>⚙️</span>
+                    <span>API-integrasjoner</span>
+                </h2>
+            </div>
+            <div class="modal-body">
+                <div id="integrationsContainer">
+                    <!-- Will be populated -->
+                </div>
+                <button class="big-button secondary" onclick="closeSettingsModal()" style="margin-top: 2rem;">Lukk</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Store (migrated from v1)
+        // TODO: Replace with IAM/CIAM solution (Azure AD, Auth0, Okta, etc.)
+        // Future: Role-based access tied to contracts
+        // Example: User "kari.p@mesta.no" → Contract FV12-2025 → See only FV12 UEs
+        const USERS = {
+            'admin': {
+                username: 'admin',
+                password: 'admin123',
+                role: 'admin',
+                name: 'Admin Bruker',
+                email: 'admin@mesta.no',
+                ueId: null
+            },
+            'prosjektleder': {
+                username: 'prosjektleder',
+                password: 'proj123',
+                role: 'prosjektleder',
+                name: 'Kari Prosjektleder',
+                email: 'kari.p@mesta.no',
+                ueId: null
+            },
+            'ue': {
+                username: 'ue001',
+                password: 'ue123',
+                role: 'ue',
+                name: 'Per Hansen',
+                email: 'per@bergvesen.no',
+                ueId: 'ue-001'
+            }
+        };
+
+        let CURRENT_USER = null;
+        let LAST_EVALUATION_RESULT = null;
+        let CURRENT_UE_CONTEXT = null;
+        let PENDING_DOCUMENTS = {};
+
+        // API Integrations Configuration
+        const API_INTEGRATIONS = {
+            brreg: {
+                name: 'Brønnøysundregistrene',
+                icon: '🏛️',
+                description: 'Verifiserer at bedriften er aktiv',
+                endpoint: 'https://data.brreg.no/enhetsregisteret/api',
+                status: 'CONNECTED',
+                lastSync: '2025-02-10T08:30:00Z',
+                enabled: true
+            },
+            startbank: {
+                name: 'StartBANK',
+                icon: '📋',
+                description: 'HMS-egenerklæring og skatteattest',
+                endpoint: 'https://startbank.no/api/v1',
+                status: 'CONNECTED',
+                lastSync: '2025-02-10T07:15:00Z',
+                enabled: true
+            },
+            landax: {
+                name: 'Landax HMS',
+                icon: '🦺',
+                description: 'HMS-registrering og dokumentasjon',
+                endpoint: 'https://api.landax.no/v1',
+                status: 'CONNECTED',
+                lastSync: '2025-02-10T09:00:00Z',
+                enabled: true
+            },
+            hmsreg: {
+                name: 'HMSReg',
+                icon: '📊',
+                description: 'Rapportering til HMS-registeret',
+                endpoint: 'https://hmsreg.no/api/v1',
+                status: 'DISCONNECTED',
+                lastSync: null,
+                enabled: false
+            }
+        };
+
+        const MOCK_UE_DATABASE = [
+            {
+                id: 'ue-001',
+                name: 'Bergvesen AS',
+                orgNumber: '987654321',
+                contractId: 'FV12-2025-MESTA',
+                status: 'ACTIVE',
+                lastChecked: '2025-02-09T14:30:00Z',
+                complianceChecks: [
+                    { code: 'BRREG_ACTIVE', name: 'Aktivt i Brønnøysund', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' },
+                    { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' },
+                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' }
+                ],
+                employees: [
+                    {
+                        id: 'emp-001',
+                        name: 'Per Hansen',
+                        role: 'Gravemaskinfører',
+                        phone: '+47 900 00 001',
+                        email: 'per@bergvesen.no',
+                        documents: [
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse CE', status: 'OK', expiryDate: '2026-05-15' },
+                            { type: 'MACHINERY_CERT', description: 'Maskinførerbevis', status: 'OK', expiryDate: '2027-03-20' },
+                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'OK', expiryDate: '2026-06-10' }
+                        ]
+                    },
+                    {
+                        id: 'emp-002',
+                        name: 'Kari Olsen',
+                        role: 'Anleggsleder',
+                        phone: '+47 900 00 002',
+                        email: 'kari@bergvesen.no',
+                        documents: [
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse B', status: 'OK', expiryDate: '2027-02-10' },
+                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'EXPIRED', expiryDate: '2025-01-15' },
+                            { type: 'TRADE_CERT', description: 'Fagbrev', status: 'OK', expiryDate: null }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'ue-002',
+                name: 'Anlegg Nord AS',
+                orgNumber: '876543210',
+                contractId: 'FV12-2025-MESTA',
+                status: 'BLOCKED',
+                lastChecked: '2025-02-08T10:15:00Z',
+                complianceChecks: [
+                    { code: 'BRREG_ACTIVE', name: 'Aktivt i Brønnøysund', status: 'OK', icon: '✓', checkedAt: '2025-02-08T10:15:00Z' },
+                    { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', status: 'EXPIRED', icon: '✗', checkedAt: '2025-02-08T10:15:00Z' },
+                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest', status: 'OK', icon: '✓', checkedAt: '2025-02-08T10:15:00Z' }
+                ],
+                employees: [
+                    {
+                        id: 'emp-003',
+                        name: 'Ole Johansen',
+                        role: 'Tømrer',
+                        phone: '+47 900 00 003',
+                        email: 'ole@anleggnord.no',
+                        documents: [
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse B', status: 'OK', expiryDate: '2027-02-10' },
+                            { type: 'TRADE_CERT', description: 'Fagbrev tømrer', status: 'OK', expiryDate: null },
+                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'OK', expiryDate: '2026-06-18' }
+                        ]
+                    }
+                ]
+            },
+            {
+                id: 'ue-003',
+                name: 'Asfalt Service AS',
+                orgNumber: '765432109',
+                contractId: 'E18-2025-MESTA',
+                status: 'ACTIVE',
+                lastChecked: '2025-02-07T16:45:00Z',
+                complianceChecks: [
+                    { code: 'BRREG_ACTIVE', name: 'Aktivt i Brønnøysund', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' },
+                    { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' },
+                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' }
+                ],
+                employees: [
+                    {
+                        id: 'emp-004',
+                        name: 'Lars Pedersen',
+                        role: 'Asfaltlegger',
+                        phone: '+47 900 00 004',
+                        email: 'lars@asfaltservice.no',
+                        documents: [
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse C', status: 'OK', expiryDate: '2026-08-20' },
+                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'OK', expiryDate: '2026-09-15' }
+                        ]
+                    },
+                    {
+                        id: 'emp-005',
+                        name: 'Mari Berg',
+                        role: 'Maskinoperatør',
+                        phone: '+47 900 00 005',
+                        email: 'mari@asfaltservice.no',
+                        documents: [
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse CE', status: 'OK', expiryDate: '2027-01-10' },
+                            { type: 'MACHINERY_CERT', description: 'Maskinførerbevis', status: 'OK', expiryDate: '2026-11-30' },
+                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'OK', expiryDate: '2026-07-22' }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        const MOCK_PROFF_DATABASE = [
+            {
+                name: 'Ps Anlegg AS',
+                orgNumber: '912561798',
+                address: 'Vik 3, 4885 Grimstad',
+                municipality: 'Grimstad',
+                industry: 'Anleggsvirksomhet',
+                employees: 25
+            },
+            {
+                name: 'Veidrift Norge AS',
+                orgNumber: '987123456',
+                address: 'Storgata 15, 0155 Oslo',
+                municipality: 'Oslo',
+                industry: 'Anleggsvirksomhet',
+                employees: 45
+            },
+            {
+                name: 'Asfalt & Vei AS',
+                orgNumber: '876234567',
+                address: 'Industriveien 22, 0581 Oslo',
+                municipality: 'Oslo',
+                industry: 'Vei- og gatebygging',
+                employees: 78
+            },
+            {
+                name: 'Norsk Anlegg Sør AS',
+                orgNumber: '765345678',
+                address: 'Havnegata 5, 4014 Stavanger',
+                municipality: 'Stavanger',
+                industry: 'Entreprenørvirksomhet',
+                employees: 120
+            },
+            {
+                name: 'Transport & Logistikk Vest',
+                orgNumber: '654456789',
+                address: 'Nygårdsgaten 112, 5008 Bergen',
+                municipality: 'Bergen',
+                industry: 'Godstransport på vei',
+                employees: 34
+            },
+            {
+                name: 'Veidrift AS',
+                orgNumber: '998012345',
+                address: 'Hovedveien 123, 2000 Lillestrøm',
+                municipality: 'Lillestrøm',
+                industry: 'Drift og vedlikehold av vei',
+                employees: 87
+            },
+            {
+                name: 'Bergvesen AS',
+                orgNumber: '987654321',
+                address: 'Fjellveien 45, 3610 Kongsberg',
+                municipality: 'Kongsberg',
+                industry: 'Maskinentreprenør',
+                employees: 15
+            },
+            {
+                name: 'Anlegg Nord AS',
+                orgNumber: '876543210',
+                address: 'Nordgata 12, 8514 Narvik',
+                municipality: 'Narvik',
+                industry: 'Bygg og anlegg',
+                employees: 8
+            },
+            {
+                name: 'Asfalt Service AS',
+                orgNumber: '765432109',
+                address: 'Industriveien 88, 3920 Porsgrunn',
+                municipality: 'Porsgrunn',
+                industry: 'Asfaltarbeid',
+                employees: 42
+            }
+        ];
+
+        // Login
+        function quickLogin(role) {
+            showLoading('Logger inn...');
+            setTimeout(() => {
+                CURRENT_USER = USERS[role];
+                document.getElementById('userName').textContent = CURRENT_USER.name;
+                document.getElementById('userRole').textContent = getRoleDisplayName(CURRENT_USER.role);
+                document.getElementById('userAvatar').textContent = CURRENT_USER.name.charAt(0);
+                
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('appContainer').classList.add('active');
+                
+                if (role === 'ue') {
+                    showUEView();
+                } else {
+                    showAdminView();
+                }
+                
+                hideLoading();
+            }, 800);
+        }
+
+        function logout() {
+            CURRENT_USER = null;
+            CURRENT_UE_CONTEXT = null;
+            document.getElementById('appContainer').classList.remove('active');
+            document.getElementById('loginScreen').style.display = 'flex';
+        }
+
+        function getRoleDisplayName(role) {
+            const roles = {
+                'admin': 'Administrator',
+                'prosjektleder': 'Prosjektleder',
+                'ue': 'Underentreprenør'
+            };
+            return roles[role] || role;
+        }
+
+        // Views
+        function showAdminView() {
+            document.getElementById('adminView').classList.remove('hidden');
+            document.getElementById('ueView').classList.add('hidden');
+            populateContractFilter();
+            renderUEList();
+            updateStats();
+            
+            // Show onboarding for new users
+            checkOnboarding();
+        }
+
+        function populateContractFilter() {
+            const contracts = [...new Set(MOCK_UE_DATABASE.map(ue => ue.contractId))].sort();
+            const select = document.getElementById('contractFilter');
+            
+            // Keep "Alle kontrakter" and add unique contracts
+            select.innerHTML = '<option value="all">Alle kontrakter</option>' + 
+                contracts.map(contract => `<option value="${contract}">${contract}</option>`).join('');
+        }
+
+        let currentContractFilter = 'all';
+
+        function filterByContract() {
+            currentContractFilter = document.getElementById('contractFilter').value;
+            renderUEList();
+            updateStats();
+        }
+
+        function getFilteredUEs() {
+            if (currentContractFilter === 'all') {
+                return MOCK_UE_DATABASE;
+            }
+            return MOCK_UE_DATABASE.filter(ue => ue.contractId === currentContractFilter);
+        }
+
+        function showUEView() {
+            document.getElementById('adminView').classList.add('hidden');
+            document.getElementById('ueView').classList.remove('hidden');
+            renderUEStatus();
+        }
+
+        // UE List Rendering
+        function renderUEList() {
+            const container = document.getElementById('ueListContent');
+            const filteredUEs = getFilteredUEs();
+            
+            // Update filter stats
+            const filterStats = document.getElementById('filterStats');
+            if (currentContractFilter === 'all') {
+                filterStats.textContent = `Viser alle ${filteredUEs.length} bedrifter`;
+            } else {
+                filterStats.textContent = `${filteredUEs.length} bedrift(er) på kontrakt ${currentContractFilter}`;
+            }
+            
+            const html = filteredUEs.map(ue => {
+                const empCount = ue.employees ? ue.employees.length : 0;
+                const statusClass = ue.status === 'ACTIVE' ? 'ok' : 'error';
+                const statusText = ue.status === 'ACTIVE' ? '✓ Godkjent' : '✗ Sperret';
+                
+                return `
+                    <div class="list-item" onclick="viewUEDetails('${ue.id}')">
+                        <div class="list-item-info">
+                            <div class="list-item-name">${ue.name}</div>
+                            <div class="list-item-meta">
+                                <span class="meta-badge">📋 ${ue.contractId}</span>
+                                <span class="meta-badge">👥 ${empCount} ansatte</span>
+                                <span class="meta-badge">🏢 Org.nr: ${ue.orgNumber}</span>
+                            </div>
+                        </div>
+                        <div class="status-badge ${statusClass}">${statusText}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html || `
+                <p style="text-align: center; color: #999; padding: 2rem;">
+                    ${currentContractFilter === 'all' ? 'Ingen bedrifter registrert ennå' : `Ingen bedrifter funnet på kontrakt ${currentContractFilter}`}
+                </p>
+            `;
+        }
+
+        function updateStats() {
+            const filteredUEs = getFilteredUEs();
+            const total = filteredUEs.length;
+            const active = filteredUEs.filter(ue => ue.status === 'ACTIVE').length;
+            const blocked = total - active;
+            const employees = filteredUEs.reduce((sum, ue) => sum + (ue.employees ? ue.employees.length : 0), 0);
+            
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statActive').textContent = active;
+            document.getElementById('statBlocked').textContent = blocked;
+            document.getElementById('statEmployees').textContent = employees;
+        }
+
+        function renderUEStatus() {
+            const ue = MOCK_UE_DATABASE.find(u => u.id === CURRENT_USER.ueId);
+            if (!ue) {
+                document.getElementById('ueStatusContent').innerHTML = '<p style="text-align: center; padding: 3rem;">Fant ikke bedriftsdata</p>';
+                return;
+            }
+
+            const empCount = ue.employees ? ue.employees.length : 0;
+            let docsOK = 0;
+            let docsExpiring = 0;
+            let docsExpired = 0;
+
+            if (ue.employees) {
+                ue.employees.forEach(emp => {
+                    emp.documents.forEach(doc => {
+                        if (doc.status === 'OK') docsOK++;
+                        else if (doc.status === 'EXPIRED') docsExpired++;
+                        else docsExpiring++;
+                    });
+                });
+            }
+
+            const employeesHtml = ue.employees ? ue.employees.map(emp => {
+                const docCount = emp.documents.length;
+                const okCount = emp.documents.filter(d => d.status === 'OK').length;
+                const badgeClass = okCount === docCount ? 'complete' : 'incomplete';
+                const badgeText = okCount === docCount ? `✓ ${docCount} dokumenter OK` : `⚠️ ${docCount - okCount} mangler`;
+
+                return `
+                    <div class="employee-card">
+                        <div class="employee-header">
+                            <div>
+                                <div class="employee-name">${emp.name}</div>
+                                <div class="employee-role">${emp.role}</div>
+                            </div>
+                            <div class="doc-badge ${badgeClass}">${badgeText}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('') : '';
+
+            const html = `
+                <div class="status-overview slide-up">
+                    <div class="section-header">
+                        <span class="section-icon">🏢</span>
+                        <h2 class="section-title">${ue.name}</h2>
+                    </div>
+                    <div class="status-badge ${ue.status === 'ACTIVE' ? 'ok' : 'error'}" style="display: inline-block; margin-bottom: 2rem;">
+                        ${ue.status === 'ACTIVE' ? '✓ Din bedrift er godkjent' : '✗ Din bedrift er sperret'}
+                    </div>
+
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-number">${empCount}</div>
+                            <div class="status-label">Ansatte</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number" style="-webkit-text-fill-color: var(--success);">${docsOK}</div>
+                            <div class="status-label">Dokumenter OK</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number" style="-webkit-text-fill-color: var(--warning);">${docsExpiring}</div>
+                            <div class="status-label">Utløper snart</div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-number" style="-webkit-text-fill-color: var(--error);">${docsExpired}</div>
+                            <div class="status-label">Utløpt</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="ue-list slide-up" style="margin-top: 2rem;">
+                    <div class="section-header">
+                        <span class="section-icon">👥</span>
+                        <h2 class="section-title">Dine ansatte</h2>
+                    </div>
+                    ${employeesHtml || '<p style="text-align: center; color: #999; padding: 2rem;">Ingen ansatte registrert</p>'}
+                </div>
+            `;
+            
+            document.getElementById('ueStatusContent').innerHTML = html;
+        }
+
+        // UE Details Modal
+        function viewUEDetails(ueId) {
+            const ue = MOCK_UE_DATABASE.find(u => u.id === ueId);
+            if (!ue) return;
+
+            CURRENT_UE_CONTEXT = ue;
+
+            const empCount = ue.employees ? ue.employees.length : 0;
+            
+            // Compliance checks HTML
+            const checksHtml = ue.complianceChecks ? ue.complianceChecks.map(check => `
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: ${check.status === 'OK' ? '#D1FAE5' : (check.status === 'PENDING' ? '#FEF3C7' : '#FEE2E2')}; border-radius: 12px; margin-bottom: 0.75rem;">
+                    <div>
+                        <div style="font-weight: 700; margin-bottom: 0.25rem;">${check.name}</div>
+                        <div style="font-size: 0.85rem; color: #666;">
+                            ${check.status === 'PENDING' ? 'Venter på dokumentasjon' : `Sjekket: ${formatTimestamp(check.checkedAt)}`}
+                        </div>
+                    </div>
+                    <div class="status-badge ${check.status === 'OK' ? 'ok' : (check.status === 'PENDING' ? 'warning' : 'error')}" style="padding: 0.5rem 1rem;">
+                        ${check.icon} ${check.status === 'OK' ? 'OK' : (check.status === 'PENDING' ? 'Venter' : check.status)}
+                    </div>
+                </div>
+            `).join('') : '<p style="color: #999;">Ingen compliance-sjekker utført</p>';
+            
+            const employeesHtml = ue.employees ? ue.employees.map(emp => {
+                const docCount = emp.documents.length;
+                const okCount = emp.documents.filter(d => d.status === 'OK').length;
+                const badgeClass = okCount === docCount ? 'complete' : (okCount === 0 ? 'missing' : 'incomplete');
+                const badgeText = okCount === docCount ? `✓ ${docCount} OK` : `⚠️ ${docCount - okCount} mangler`;
+
+                const docsHtml = emp.documents.map(doc => `
+                    <div style="display: flex; justify-content: space-between; padding: 0.75rem; background: var(--mesta-gray); border-radius: 12px; margin-bottom: 0.5rem;">
+                        <span>${doc.description}</span>
+                        <span class="doc-badge ${doc.status.toLowerCase()}" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;">
+                            ${doc.status === 'OK' ? '✓' : (doc.status === 'EXPIRED' ? '✗' : '⚠️')} ${doc.status}
+                        </span>
+                    </div>
+                `).join('');
+
+                const smsStatus = PENDING_DOCUMENTS[emp.id];
+                const smsHtml = smsStatus ? `
+                    <div class="sms-status-badge ${smsStatus.status === 'REMINDER_SENT' ? 'reminder' : (smsStatus.status === 'COMPLETED' ? 'sent' : 'pending')}">
+                        ${smsStatus.status === 'REMINDER_SENT' ? '⚠️ Purring sendt' : (smsStatus.status === 'COMPLETED' ? '✓ Dokumenter mottatt' : '📱 SMS sendt')}
+                    </div>
+                ` : '';
+
+                return `
+                    <div class="employee-card">
+                        <div class="employee-header">
+                            <div>
+                                <div class="employee-name">${emp.name}</div>
+                                <div class="employee-role">${emp.role}</div>
+                                ${emp.phone ? `<div style="font-size: 0.9rem; color: #666; margin-top: 0.25rem;">📱 ${emp.phone}</div>` : ''}
+                                ${smsHtml}
+                            </div>
+                            <div class="doc-badge ${badgeClass}">${badgeText}</div>
+                        </div>
+                        <div style="margin-top: 1rem;">
+                            ${docsHtml}
+                        </div>
+                    </div>
+                `;
+            }).join('') : '<p style="text-align: center; color: #999; padding: 2rem;">Ingen ansatte registrert</p>';
+
+            const content = `
+                <div class="status-badge ${ue.status === 'ACTIVE' ? 'ok' : 'error'}" style="margin-bottom: 1.5rem;">
+                    ${ue.status === 'ACTIVE' ? '✓ Godkjent' : '✗ Sperret'}
+                </div>
+                
+                <div style="display: grid; gap: 1rem; margin-bottom: 2rem; background: var(--mesta-gray); padding: 1.5rem; border-radius: 16px;">
+                    <div><strong>Organisasjonsnummer:</strong> ${ue.orgNumber}</div>
+                    <div><strong>Kontrakt:</strong> ${ue.contractId}</div>
+                    <div><strong>Ansatte:</strong> ${empCount}</div>
+                    <div><strong>Sist sjekket:</strong> ${formatTimestamp(ue.lastChecked)}</div>
+                </div>
+
+                <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>📋</span> Compliance-sjekker
+                </h3>
+                <div style="margin-bottom: 2rem;">
+                    ${checksHtml}
+                </div>
+
+                <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>👥</span> Ansatte
+                </h3>
+                ${employeesHtml}
+
+                <button class="add-employee-btn" onclick="openAddEmployeeModal()">
+                    ➕ Legg til ansatt
+                </button>
+                
+                <button class="big-button secondary" onclick="exportUEToExcel('${ue.id}')" style="margin-top: 1rem; background: linear-gradient(135deg, var(--mesta-green) 0%, #008C42 100%); color: white;">
+                    📊 Eksporter til Excel
+                </button>
+            `;
+
+            document.getElementById('ueDetailsTitle').innerHTML = `<span>🏢</span><span>${ue.name}</span>`;
+            document.getElementById('ueDetailsContent').innerHTML = content;
+            document.getElementById('ueDetailsModal').classList.add('active');
+        }
+
+        function closeUEDetailsModal() {
+            document.getElementById('ueDetailsModal').classList.remove('active');
+        }
+
+        // Add UE Modal
+        function showAddUEModal() {
+            resetAddUEModal();
+            document.getElementById('addUEModal').classList.add('active');
+        }
+
+        function closeAddUEModal() {
+            document.getElementById('addUEModal').classList.remove('active');
+        }
+
+        function resetAddUEModal() {
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step1').classList.remove('completed');
+            document.getElementById('step2').classList.remove('active', 'completed');
+            document.getElementById('step3').classList.remove('active', 'completed');
+            
+            document.getElementById('searchStep').classList.remove('hidden');
+            document.getElementById('confirmStep').classList.add('hidden');
+            document.getElementById('completeStep').classList.add('hidden');
+            
+            document.getElementById('companySearchInput').value = '';
+            document.getElementById('searchResults').innerHTML = '';
+        }
+
+        let selectedCompany = null;
+
+        function showManualEntry(searchQuery = '') {
+            document.getElementById('searchStep').classList.add('hidden');
+            document.getElementById('confirmStep').classList.remove('hidden');
+            
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('active');
+            
+            // Pre-fill org number if it looks like one (9 digits)
+            const isOrgNumber = /^\d{9}$/.test(searchQuery);
+            const prefilledOrgNr = isOrgNumber ? searchQuery : '';
+            const prefilledName = !isOrgNumber ? searchQuery : '';
+            
+            document.getElementById('confirmContent').innerHTML = `
+                <div style="text-align: center; padding: 1.5rem; background: var(--mesta-gray); border-radius: 20px; margin-bottom: 2rem;">
+                    <div style="font-size: 3rem; margin-bottom: 1rem;">✏️</div>
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">Manuell registrering</h3>
+                    <p style="color: #666; font-size: 0.95rem;">Fyll inn bedriftsopplysninger</p>
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">🏢 Firmanavn</label>
+                    <input type="text" class="form-input" id="manualCompanyName" 
+                           placeholder="F.eks. Veidrift AS" value="${prefilledName}" required>
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">🔢 Organisasjonsnummer</label>
+                    <input type="text" class="form-input" id="manualOrgNumber" 
+                           placeholder="9 siffer" pattern="[0-9]{9}" value="${prefilledOrgNr}" required>
+                    <small style="color: #666; font-size: 0.85rem; display: block; margin-top: 0.5rem;">
+                        9 siffer uten mellomrom
+                    </small>
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">📋 Kontrakt-ID</label>
+                    <input type="text" class="form-input" id="manualContractId" 
+                           placeholder="F.eks. FV12-2025-MESTA" required>
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">📄 Påkrevd dokumentasjon</label>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                        Velg hvilke dokumenter bedriften må levere:
+                    </p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="TAX_CERTIFICATE" checked>
+                            <span class="checkbox-label"><strong>🧾 Skatteattest</strong></span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="VAT_CERTIFICATE" checked>
+                            <span class="checkbox-label"><strong>💰 MVA-attest</strong></span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="HMS_DECLARATION" checked>
+                            <span class="checkbox-label"><strong>🦺 HMS-egenerklæring</strong></span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="INSURANCE_CERTIFICATE">
+                            <span class="checkbox-label"><strong>🛡️ Forsikringsbevis</strong></span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="EMPLOYEE_LIST">
+                            <span class="checkbox-label"><strong>👥 Ansatteliste</strong></span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="QUALITY_CERTIFICATE">
+                            <span class="checkbox-label"><strong>⭐ Kvalitetssertifikat</strong></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div style="display: flex; gap: 1rem;">
+                    <button class="big-button secondary" onclick="backToSearch()" style="flex: 1;">
+                        ← Tilbake til søk
+                    </button>
+                    <button class="big-button primary" onclick="confirmManualEntry()" style="flex: 1;">
+                        ✓ Bekreft og legg til
+                    </button>
+                </div>
+            `;
+            
+            // Focus on first empty field
+            setTimeout(() => {
+                if (!prefilledName) {
+                    document.getElementById('manualCompanyName').focus();
+                } else if (!prefilledOrgNr) {
+                    document.getElementById('manualOrgNumber').focus();
+                } else {
+                    document.getElementById('manualContractId').focus();
+                }
+            }, 100);
+        }
+
+        function backToSearch() {
+            document.getElementById('step1').classList.add('active');
+            document.getElementById('step1').classList.remove('completed');
+            document.getElementById('step2').classList.remove('active');
+            
+            document.getElementById('searchStep').classList.remove('hidden');
+            document.getElementById('confirmStep').classList.add('hidden');
+        }
+
+        function confirmManualEntry() {
+            const companyName = document.getElementById('manualCompanyName').value.trim();
+            const orgNumber = document.getElementById('manualOrgNumber').value.trim();
+            const contractId = document.getElementById('manualContractId').value.trim();
+            
+            // Validation with visual feedback
+            let hasError = false;
+            
+            if (!companyName) {
+                showFieldError('manualCompanyName', 'Firmanavn er påkrevd');
+                hasError = true;
+            }
+            
+            if (!orgNumber) {
+                showFieldError('manualOrgNumber', 'Organisasjonsnummer er påkrevd');
+                hasError = true;
+            } else if (!/^\d{9}$/.test(orgNumber)) {
+                showFieldError('manualOrgNumber', 'Må være 9 siffer (uten mellomrom)');
+                hasError = true;
+            }
+            
+            if (!contractId) {
+                showFieldError('manualContractId', 'Kontrakt-ID er påkrevd');
+                hasError = true;
+            }
+            
+            if (hasError) return;
+            
+            // Get selected document requirements
+            const selectedDocs = Array.from(
+                document.querySelectorAll('input[name="manualDocType"]:checked')
+            ).map(cb => cb.value);
+
+            if (selectedDocs.length === 0) {
+                alert('⚠️ Vennligst velg minst ett dokument som skal kreves av bedriften.');
+                return;
+            }
+            
+            // Check if org number already exists
+            const exists = MOCK_UE_DATABASE.find(ue => ue.orgNumber === orgNumber);
+            if (exists) {
+                if (!confirm(`⚠️ Bedrift med org.nr ${orgNumber} eksisterer allerede:\n\n"${exists.name}"\nKontrakt: ${exists.contractId}\n\nVil du fortsette med å legge til en ny post?`)) {
+                    return;
+                }
+            }
+            
+            showLoading('Legger til bedrift...');
+            
+            setTimeout(() => {
+                // Create company object
+                selectedCompany = {
+                    name: companyName,
+                    orgNumber: orgNumber,
+                    municipality: 'Manuelt registrert',
+                    industry: 'Manuelt registrert',
+                    employees: 0
+                };
+                
+                // Add to database
+                const newUE = {
+                    id: `ue-${String(MOCK_UE_DATABASE.length + 1).padStart(3, '0')}`,
+                    name: companyName,
+                    orgNumber: orgNumber,
+                    contractId: contractId,
+                    status: 'ACTIVE',
+                    lastChecked: new Date().toISOString(),
+                    requiredDocuments: selectedDocs,
+                    complianceChecks: selectedDocs.map(docType => ({
+                        code: docType,
+                        name: getDocumentDisplayName(docType),
+                        status: 'PENDING',
+                        icon: '⏳',
+                        checkedAt: new Date().toISOString()
+                    })),
+                    employees: []
+                };
+                
+                MOCK_UE_DATABASE.push(newUE);
+                
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('step3').classList.add('completed');
+                
+                document.getElementById('confirmStep').classList.add('hidden');
+                document.getElementById('completeStep').classList.remove('hidden');
+                document.getElementById('successCompanyName').innerHTML = `
+                    ${companyName} er nå registrert i systemet<br>
+                    <small style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem; display: block;">
+                        ${selectedDocs.length} dokument${selectedDocs.length > 1 ? 'er' : ''} påkrevd
+                    </small>
+                `;
+                
+                hideLoading();
+                
+                setTimeout(() => {
+                    closeAddUEModal();
+                    renderUEList();
+                    updateStats();
+                }, 2500);
+            }, 1000);
+        }
+
+        function showFieldError(fieldId, message) {
+            const field = document.getElementById(fieldId);
+            if (!field) return;
+            
+            // Add error styling
+            field.style.borderColor = 'var(--error)';
+            field.style.boxShadow = '0 0 0 4px rgba(227, 30, 36, 0.1)';
+            
+            // Create error message
+            const existingError = field.parentElement.querySelector('.field-error');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'field-error';
+            errorDiv.style.cssText = `
+                color: var(--error);
+                font-size: 0.85rem;
+                font-weight: 600;
+                margin-top: 0.5rem;
+                animation: slideUp 0.3s ease-out;
+            `;
+            errorDiv.textContent = '⚠️ ' + message;
+            field.parentElement.appendChild(errorDiv);
+            
+            // Focus the field
+            field.focus();
+            
+            // Remove error on input
+            field.addEventListener('input', function clearError() {
+                field.style.borderColor = '';
+                field.style.boxShadow = '';
+                const err = field.parentElement.querySelector('.field-error');
+                if (err) err.remove();
+                field.removeEventListener('input', clearError);
+            }, { once: true });
+        }
+
+        function searchCompany() {
+            const query = document.getElementById('companySearchInput').value.trim();
+            if (!query) {
+                alert('Vennligst skriv inn et søk');
+                return;
+            }
+
+            showLoading('Søker etter bedrifter...');
+            
+            // Try real API first, but with quick timeout
+            const apiPromise = searchProffNo(query);
+            const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve(null), 2000));
+            
+            Promise.race([apiPromise, timeoutPromise])
+                .then(apiResults => {
+                    // Always search mock database
+                    const mockResults = MOCK_PROFF_DATABASE.filter(company => {
+                        const searchLower = query.toLowerCase();
+                        return (
+                            company.name.toLowerCase().includes(searchLower) ||
+                            company.orgNumber.includes(query) ||
+                            (company.municipality && company.municipality.toLowerCase().includes(searchLower))
+                        );
+                    });
+                    
+                    // Combine results
+                    let allResults = [];
+                    
+                    if (apiResults && apiResults.length > 0) {
+                        allResults = [...apiResults, ...mockResults];
+                        // Remove duplicates based on orgNumber
+                        allResults = allResults.filter((company, index, self) =>
+                            index === self.findIndex((c) => c.orgNumber === company.orgNumber)
+                        );
+                    } else {
+                        allResults = mockResults;
+                    }
+                    
+                    hideLoading();
+                    
+                    if (allResults.length === 0) {
+                        document.getElementById('searchResults').innerHTML = `
+                            <div style="text-align: center; padding: 2rem; background: var(--mesta-gray); border-radius: 20px; margin-bottom: 1rem;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                                <p style="color: #666; font-size: 1.1rem; margin-bottom: 1.5rem;">
+                                    Ingen bedrifter funnet for "<strong>${query}</strong>"
+                                </p>
+                                <button class="big-button primary" onclick="showManualEntry('${query}')">
+                                    ✏️ Registrer manuelt
+                                </button>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    displaySearchResults(allResults);
+                })
+                .catch(error => {
+                    console.error('Search error:', error);
+                    
+                    // Fallback to mock on error
+                    const mockResults = MOCK_PROFF_DATABASE.filter(company => {
+                        const searchLower = query.toLowerCase();
+                        return (
+                            company.name.toLowerCase().includes(searchLower) ||
+                            company.orgNumber.includes(query)
+                        );
+                    });
+                    
+                    hideLoading();
+                    
+                    if (mockResults.length === 0) {
+                        document.getElementById('searchResults').innerHTML = `
+                            <div style="text-align: center; padding: 2rem; background: var(--mesta-gray); border-radius: 20px; margin-bottom: 1rem;">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">🔍</div>
+                                <p style="color: #666; font-size: 1.1rem; margin-bottom: 0.5rem;">
+                                    Ingen bedrifter funnet for "<strong>${query}</strong>"
+                                </p>
+                                <p style="color: #999; font-size: 0.9rem; margin-bottom: 1.5rem;">
+                                    ℹ️ Kunne ikke koble til Brønnøysundregistrene. Søkte i lokal database.
+                                </p>
+                                <button class="big-button primary" onclick="showManualEntry('${query}')">
+                                    ✏️ Registrer manuelt
+                                </button>
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    displaySearchResults(mockResults);
+                });
+        }
+
+        // Proff.no / Brønnøysund API integration
+        async function searchProffNo(query) {
+            try {
+                const isOrgNumber = /^\d{9}$/.test(query.replace(/\s/g, ''));
+                const cleanOrgNumber = query.replace(/\s/g, '');
+                let apiUrl;
+                
+                if (isOrgNumber) {
+                    // Search by org number
+                    apiUrl = `https://data.brreg.no/enhetsregisteret/api/enheter/${cleanOrgNumber}`;
+                } else {
+                    // Search by name
+                    apiUrl = `https://data.brreg.no/enhetsregisteret/api/enheter?navn=${encodeURIComponent(query)}&size=10`;
+                }
+                
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                const response = await fetch(apiUrl, { 
+                    signal: controller.signal,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    console.log('API response not OK:', response.status);
+                    return null;
+                }
+                
+                const data = await response.json();
+                
+                // Transform Brønnøysund data to our format
+                if (isOrgNumber) {
+                    // Single result
+                    if (!data || !data.organisasjonsnummer) {
+                        return null;
+                    }
+                    
+                    return [{
+                        name: data.navn || 'Ukjent navn',
+                        orgNumber: data.organisasjonsnummer,
+                        address: data.forretningsadresse ? 
+                            `${data.forretningsadresse.adresse?.[0] || ''}, ${data.forretningsadresse.postnummer || ''} ${data.forretningsadresse.poststed || ''}`.trim() : 
+                            'Ikke oppgitt',
+                        municipality: data.forretningsadresse?.kommune || data.postadresse?.kommune || 'Ukjent',
+                        industry: data.naeringskode1?.beskrivelse || 'Ikke oppgitt',
+                        employees: data.antallAnsatte || 0,
+                        source: 'Brønnøysundregistrene'
+                    }];
+                } else {
+                    // Multiple results
+                    if (!data._embedded || !data._embedded.enheter) {
+                        return null;
+                    }
+                    
+                    return data._embedded.enheter.map(enhet => ({
+                        name: enhet.navn || 'Ukjent navn',
+                        orgNumber: enhet.organisasjonsnummer,
+                        address: enhet.forretningsadresse ? 
+                            `${enhet.forretningsadresse.adresse?.[0] || ''}, ${enhet.forretningsadresse.postnummer || ''} ${enhet.forretningsadresse.poststed || ''}`.trim() : 
+                            'Ikke oppgitt',
+                        municipality: enhet.forretningsadresse?.kommune || enhet.postadresse?.kommune || 'Ukjent',
+                        industry: enhet.naeringskode1?.beskrivelse || 'Ikke oppgitt',
+                        employees: enhet.antallAnsatte || 0,
+                        source: 'Brønnøysundregistrene'
+                    }));
+                }
+            } catch (error) {
+                // Network error or timeout - return null to fallback
+                console.log('API error (expected if network blocked):', error.message);
+                return null;
+            }
+        }
+
+        function displaySearchResults(results) {
+            if (!results || results.length === 0) {
+                document.getElementById('searchResults').innerHTML = '';
+                return;
+            }
+            
+            const html = results.map(company => {
+                // Escape company data for onclick
+                const companyJson = JSON.stringify(company).replace(/'/g, "&apos;").replace(/"/g, "&quot;");
+                
+                return `
+                <div class="search-result-card" onclick='selectCompanyFromCard(this)' data-company="${companyJson}">
+                    <div class="search-result-name">${company.name}</div>
+                    <div class="search-result-meta">
+                        <div><strong>Org.nr:</strong> ${company.orgNumber}</div>
+                        ${company.address && company.address !== 'Ikke oppgitt' ? `<div><strong>Adresse:</strong> ${company.address}</div>` : ''}
+                        <div><strong>Kommune:</strong> ${company.municipality}</div>
+                        <div><strong>Bransje:</strong> ${company.industry}</div>
+                        ${company.employees ? `<div><strong>Ansatte:</strong> ${company.employees} personer</div>` : ''}
+                        ${company.source ? `<div style="color: var(--success); font-weight: 600;">✓ Kilde: ${company.source}</div>` : ''}
+                    </div>
+                </div>
+            `;
+            }).join('');
+
+            document.getElementById('searchResults').innerHTML = html;
+        }
+
+        function selectCompanyFromCard(element) {
+            const companyJson = element.getAttribute('data-company');
+            const company = JSON.parse(companyJson.replace(/&quot;/g, '"').replace(/&apos;/g, "'"));
+            selectCompany(company);
+        }
+
+        function selectCompany(company) {
+            selectedCompany = company;
+            
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('completed');
+            document.getElementById('step2').classList.add('active');
+            
+            document.getElementById('searchStep').classList.add('hidden');
+            document.getElementById('confirmStep').classList.remove('hidden');
+            
+            document.getElementById('confirmContent').innerHTML = `
+                <div style="text-align: center; padding: 2rem; background: var(--mesta-gray); border-radius: 20px; margin-bottom: 2rem;">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🏢</div>
+                    <h3 style="font-size: 1.8rem; font-weight: 700; margin-bottom: 0.5rem;">${company.name}</h3>
+                    <p style="color: #666; font-size: 1rem;">Org.nr: ${company.orgNumber}</p>
+                    <p style="color: #666; font-size: 0.95rem; margin-top: 0.5rem;">${company.municipality}</p>
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">📋 Kontrakt-ID</label>
+                    <input type="text" class="form-input" id="contractInput" 
+                           placeholder="F.eks. FV12-2025-MESTA" required>
+                </div>
+                
+                <div class="form-field">
+                    <label class="form-label">📄 Påkrevd dokumentasjon for bedriften</label>
+                    <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
+                        Velg hvilke dokumenter bedriften må levere for å være i compliance:
+                    </p>
+                    <div class="checkbox-group">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="TAX_CERTIFICATE" checked>
+                            <span class="checkbox-label">
+                                <strong>🧾 Skatteattest</strong><br>
+                                <small style="color: #666;">Bevis på innbetalt skatt</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="VAT_CERTIFICATE" checked>
+                            <span class="checkbox-label">
+                                <strong>💰 MVA-attest</strong><br>
+                                <small style="color: #666;">Merverdiavgift i orden</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="HMS_DECLARATION" checked>
+                            <span class="checkbox-label">
+                                <strong>🦺 HMS-egenerklæring</strong><br>
+                                <small style="color: #666;">Helse, miljø og sikkerhet</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="INSURANCE_CERTIFICATE">
+                            <span class="checkbox-label">
+                                <strong>🛡️ Forsikringsbevis</strong><br>
+                                <small style="color: #666;">Ansvars- og yrkesskadeforsikring</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="EMPLOYEE_LIST">
+                            <span class="checkbox-label">
+                                <strong>👥 Ansatteliste</strong><br>
+                                <small style="color: #666;">Oversikt over ansatte på prosjekt</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="QUALITY_CERTIFICATE">
+                            <span class="checkbox-label">
+                                <strong>⭐ Kvalitetssertifikat</strong><br>
+                                <small style="color: #666;">ISO eller tilsvarende</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="ENVIRONMENTAL_CERTIFICATE">
+                            <span class="checkbox-label">
+                                <strong>🌱 Miljøsertifikat</strong><br>
+                                <small style="color: #666;">Miljøledelsessystem</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="AUTHORIZATION">
+                            <span class="checkbox-label">
+                                <strong>📜 Sentral godkjenning</strong><br>
+                                <small style="color: #666;">For spesielle bransjer</small>
+                            </span>
+                        </label>
+                    </div>
+                </div>
+                
+                <button class="big-button primary" onclick="confirmAddUE()">✓ Bekreft og legg til</button>
+            `;
+        }
+
+        function confirmAddUE() {
+            const contractId = document.getElementById('contractInput').value.trim();
+            if (!contractId) {
+                showFieldError('contractInput', 'Kontrakt-ID er påkrevd');
+                return;
+            }
+
+            // Get selected document requirements
+            const selectedDocs = Array.from(
+                document.querySelectorAll('input[name="ueDocType"]:checked')
+            ).map(cb => cb.value);
+
+            if (selectedDocs.length === 0) {
+                alert('⚠️ Vennligst velg minst ett dokument som skal kreves av bedriften.');
+                return;
+            }
+
+            showLoading('Legger til bedrift...');
+            
+            setTimeout(() => {
+                // Add to database
+                const newUE = {
+                    id: `ue-${String(MOCK_UE_DATABASE.length + 1).padStart(3, '0')}`,
+                    name: selectedCompany.name,
+                    orgNumber: selectedCompany.orgNumber,
+                    contractId: contractId,
+                    status: 'ACTIVE',
+                    lastChecked: new Date().toISOString(),
+                    requiredDocuments: selectedDocs,
+                    complianceChecks: selectedDocs.map(docType => ({
+                        code: docType,
+                        name: getDocumentDisplayName(docType),
+                        status: 'PENDING',
+                        icon: '⏳',
+                        checkedAt: new Date().toISOString()
+                    })),
+                    employees: []
+                };
+                
+                MOCK_UE_DATABASE.push(newUE);
+                
+                document.getElementById('step2').classList.remove('active');
+                document.getElementById('step2').classList.add('completed');
+                document.getElementById('step3').classList.add('completed');
+                
+                document.getElementById('confirmStep').classList.add('hidden');
+                document.getElementById('completeStep').classList.remove('hidden');
+                document.getElementById('successCompanyName').innerHTML = `
+                    ${selectedCompany.name} er nå registrert i systemet<br>
+                    <small style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem; display: block;">
+                        ${selectedDocs.length} dokument${selectedDocs.length > 1 ? 'er' : ''} påkrevd
+                    </small>
+                `;
+                
+                hideLoading();
+                
+                setTimeout(() => {
+                    closeAddUEModal();
+                    renderUEList();
+                    updateStats();
+                }, 2500);
+            }, 1500);
+        }
+
+        // Add Employee
+        function openAddEmployeeModal() {
+            if (!CURRENT_UE_CONTEXT) {
+                alert('Ingen bedrift valgt');
+                return;
+            }
+            
+            document.getElementById('addEmployeeModal').classList.add('active');
+        }
+
+        function closeEmployeeModal() {
+            document.getElementById('addEmployeeModal').classList.remove('active');
+            document.getElementById('employeeForm').reset();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const employeeForm = document.getElementById('employeeForm');
+            if (employeeForm) {
+                employeeForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    
+                    const name = document.getElementById('empName').value;
+                    const role = document.getElementById('empRole').value;
+                    const phone = document.getElementById('empPhone').value;
+                    const email = document.getElementById('empEmail').value;
+                    
+                    const selectedDocs = Array.from(
+                        document.querySelectorAll('input[name="docType"]:checked')
+                    ).map(cb => cb.value);
+
+                    if (selectedDocs.length === 0) {
+                        alert('Vennligst velg minst ett dokument');
+                        return;
+                    }
+
+                    showLoading('Sender SMS...');
+
+                    setTimeout(() => {
+                        const employeeId = `emp-${Date.now()}`;
+                        const uploadToken = Math.random().toString(36).substring(2, 15);
+
+                        const newEmployee = {
+                            id: employeeId,
+                            name: name,
+                            role: role,
+                            phone: phone,
+                            email: email,
+                            documents: selectedDocs.map(docType => ({
+                                type: docType,
+                                description: getDocumentDisplayName(docType),
+                                status: 'MISSING',
+                                expiryDate: null
+                            }))
+                        };
+
+                        // Add to current UE
+                        if (CURRENT_UE_CONTEXT) {
+                            if (!CURRENT_UE_CONTEXT.employees) {
+                                CURRENT_UE_CONTEXT.employees = [];
+                            }
+                            CURRENT_UE_CONTEXT.employees.push(newEmployee);
+                        }
+
+                        // Store pending documents
+                        PENDING_DOCUMENTS[employeeId] = {
+                            employee: newEmployee,
+                            requiredDocs: selectedDocs,
+                            uploadToken: uploadToken,
+                            sentAt: new Date().toISOString(),
+                            status: 'PENDING'
+                        };
+
+                        console.log(`
+=== SMS SENDT ===
+Til: ${phone}
+Navn: ${name}
+Dokumenter: ${selectedDocs.map(d => getDocumentDisplayName(d)).join(', ')}
+Link: ${window.location.origin}/upload/${uploadToken}
+========================
+                        `);
+
+                        hideLoading();
+                        closeEmployeeModal();
+                        
+                        // Refresh view
+                        viewUEDetails(CURRENT_UE_CONTEXT.id);
+                        
+                        alert(`✅ ${name} lagt til!\n\nSMS sendt til ${phone}\n\nFor testing: se console for SMS-innhold`);
+                    }, 1500);
+                });
+            }
+        });
+
+        function getDocumentDisplayName(docType) {
+            const names = {
+                // Employee documents
+                'DRIVERS_LICENSE': 'Førerkort',
+                'HMS_COURSE': 'HMS-opplæring',
+                'MACHINERY_CERT': 'Maskinførerbevis',
+                'TRADE_CERT': 'Fagbrev',
+                // Company documents
+                'TAX_CERTIFICATE': 'Skatteattest',
+                'VAT_CERTIFICATE': 'MVA-attest',
+                'HMS_DECLARATION': 'HMS-egenerklæring',
+                'INSURANCE_CERTIFICATE': 'Forsikringsbevis',
+                'EMPLOYEE_LIST': 'Ansatteliste',
+                'QUALITY_CERTIFICATE': 'Kvalitetssertifikat',
+                'ENVIRONMENTAL_CERTIFICATE': 'Miljøsertifikat',
+                'AUTHORIZATION': 'Sentral godkjenning'
+            };
+            return names[docType] || docType;
+        }
+
+        // Helpers
+        function showLoading(text = 'Laster...') {
+            document.getElementById('loadingText').textContent = text;
+            document.getElementById('loadingOverlay').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.remove('active');
+        }
+
+        function scrollToList() {
+            document.getElementById('ueListContainer').scrollIntoView({ 
+                behavior: 'smooth', 
+                block: 'start' 
+            });
+        }
+
+        function formatTimestamp(isoString) {
+            if (!isoString) return 'Aldri';
+            const date = new Date(isoString);
+            return date.toLocaleString('no-NO', { 
+                day: '2-digit', 
+                month: '2-digit', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Settings Modal
+        function showSettingsModal() {
+            renderIntegrations();
+            document.getElementById('settingsModal').classList.add('active');
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settingsModal').classList.remove('active');
+        }
+
+        function renderIntegrations() {
+            const container = document.getElementById('integrationsContainer');
+            
+            // Add onboarding reset button at top
+            const onboardingSection = `
+                <div style="background: linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%); border-radius: 20px; padding: 2rem; margin-bottom: 2rem; border-left: 6px solid var(--yellow);">
+                    <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; color: #92400E; display: flex; align-items: center; gap: 0.75rem;">
+                        <span style="font-size: 2rem;">🎓</span>
+                        Introduksjon
+                    </h3>
+                    <p style="color: #78350F; margin-bottom: 1.5rem; line-height: 1.6;">
+                        Vil du se introduksjonen til systemet igjen? Dette er nyttig hvis du vil friske opp kunnskapene eller vise systemet til noen andre.
+                    </p>
+                    <button class="big-button primary" onclick="resetOnboarding()" style="width: 100%; padding: 1rem; font-size: 1rem;">
+                        🎬 Se introduksjon igjen
+                    </button>
+                </div>
+            `;
+            
+            const html = Object.entries(API_INTEGRATIONS).map(([key, integration]) => {
+                const statusClass = integration.status === 'CONNECTED' ? 'ok' : 'error';
+                const statusText = integration.status === 'CONNECTED' ? 'Tilkoblet' : 'Frakoblet';
+                
+                return `
+                    <div class="employee-card" style="margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: start; gap: 1rem; margin-bottom: 1rem;">
+                            <div style="font-size: 2.5rem;">${integration.icon}</div>
+                            <div style="flex: 1;">
+                                <h3 style="font-size: 1.2rem; font-weight: 700; margin-bottom: 0.5rem;">${integration.name}</h3>
+                                <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">${integration.description}</p>
+                                <div class="status-badge ${statusClass}" style="display: inline-block;">
+                                    ${statusText}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="background: var(--mesta-gray); padding: 1rem; border-radius: 12px; font-size: 0.9rem;">
+                            <div style="margin-bottom: 0.5rem;"><strong>Endpoint:</strong> <code style="background: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.85rem;">${integration.endpoint}</code></div>
+                            <div style="margin-bottom: 0.5rem;"><strong>Sist synkronisert:</strong> ${formatTimestamp(integration.lastSync)}</div>
+                            <div style="margin-top: 1rem;">
+                                <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer;">
+                                    <input type="checkbox" ${integration.enabled ? 'checked' : ''} 
+                                           onchange="toggleIntegration('${key}', this.checked)"
+                                           style="width: 20px; height: 20px; cursor: pointer;">
+                                    <span style="font-weight: 600;">Aktivert</span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 0.75rem; margin-top: 1rem;">
+                            <button class="big-button secondary" onclick="testIntegration('${key}')" style="flex: 1; padding: 0.75rem; font-size: 0.9rem;">
+                                🔄 Test tilkobling
+                            </button>
+                            <button class="big-button secondary" onclick="syncIntegration('${key}')" style="flex: 1; padding: 0.75rem; font-size: 0.9rem;">
+                                📤 Synkroniser nå
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = onboardingSection + html;
+        }
+
+        function toggleIntegration(key, enabled) {
+            API_INTEGRATIONS[key].enabled = enabled;
+            console.log(`${API_INTEGRATIONS[key].name}: ${enabled ? 'Aktivert' : 'Deaktivert'}`);
+            
+            showNotification(
+                `${API_INTEGRATIONS[key].icon} ${API_INTEGRATIONS[key].name} ${enabled ? 'aktivert' : 'deaktivert'}`,
+                enabled ? 'success' : 'info'
+            );
+        }
+
+        function testIntegration(key) {
+            const integration = API_INTEGRATIONS[key];
+            showLoading(`Tester ${integration.name}...`);
+            
+            setTimeout(() => {
+                const success = Math.random() > 0.1; // 90% success rate
+                
+                if (success) {
+                    integration.status = 'CONNECTED';
+                    showNotification(`✓ ${integration.name} tilkobling OK`, 'success');
+                } else {
+                    integration.status = 'DISCONNECTED';
+                    showNotification(`✗ ${integration.name} tilkobling feilet`, 'error');
+                }
+                
+                hideLoading();
+                renderIntegrations();
+            }, 1500);
+        }
+
+        function syncIntegration(key) {
+            const integration = API_INTEGRATIONS[key];
+            
+            if (!integration.enabled) {
+                alert(`${integration.name} er deaktivert. Aktiver integrasjonen først.`);
+                return;
+            }
+            
+            showLoading(`Synkroniserer ${integration.name}...`);
+            
+            setTimeout(() => {
+                integration.lastSync = new Date().toISOString();
+                showNotification(`✓ ${integration.name} synkronisert`, 'success');
+                hideLoading();
+                renderIntegrations();
+            }, 2000);
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: ${type === 'success' ? 'var(--success)' : (type === 'error' ? 'var(--error)' : 'var(--blue)')};
+                color: white;
+                padding: 1rem 1.5rem;
+                border-radius: 12px;
+                box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+                z-index: 2000;
+                animation: slideUp 0.3s ease-out;
+                font-weight: 600;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease-out';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Excel Export Function
+        function exportUEToExcel(ueId) {
+            const ue = MOCK_UE_DATABASE.find(u => u.id === ueId);
+            if (!ue) {
+                alert('Bedrift ikke funnet');
+                return;
+            }
+
+            showLoading('Genererer Excel-fil...');
+
+            setTimeout(() => {
+                // Create CSV data (Excel-compatible)
+                const csv = generateUECSV(ue);
+                
+                // Create blob and download
+                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', `MESTA_${ue.name.replace(/\s/g, '_')}_${formatDate()}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                hideLoading();
+                showNotification(`✓ Excel-fil lastet ned: ${ue.name}`, 'success');
+            }, 1000);
+        }
+
+        function generateUECSV(ue) {
+            const lines = [];
+            
+            // Header
+            lines.push('MESTA COMPLIANCE RAPPORT');
+            lines.push('');
+            
+            // Company info
+            lines.push('BEDRIFTSINFORMASJON');
+            lines.push(`Navn,${ue.name}`);
+            lines.push(`Organisasjonsnummer,${ue.orgNumber}`);
+            lines.push(`Kontrakt-ID,${ue.contractId}`);
+            lines.push(`Status,${ue.status === 'ACTIVE' ? 'Godkjent' : 'Sperret'}`);
+            lines.push(`Sist sjekket,${formatTimestamp(ue.lastChecked)}`);
+            lines.push('');
+            
+            // Compliance checks
+            if (ue.complianceChecks && ue.complianceChecks.length > 0) {
+                lines.push('COMPLIANCE-SJEKKER');
+                lines.push('Sjekk,Status,Tidspunkt');
+                ue.complianceChecks.forEach(check => {
+                    lines.push(`${check.name},${check.status},${formatTimestamp(check.checkedAt)}`);
+                });
+                lines.push('');
+            }
+            
+            // Employees
+            if (ue.employees && ue.employees.length > 0) {
+                lines.push('ANSATTE OG DOKUMENTER');
+                lines.push('Navn,Stilling,Telefon,E-post,Dokument,Status,Utløpsdato');
+                
+                ue.employees.forEach(emp => {
+                    if (emp.documents && emp.documents.length > 0) {
+                        emp.documents.forEach((doc, index) => {
+                            if (index === 0) {
+                                // First document - include employee info
+                                lines.push(`${emp.name},${emp.role},${emp.phone || ''},${emp.email || ''},${doc.description},${doc.status},${doc.expiryDate || 'Ingen'}`);
+                            } else {
+                                // Additional documents - empty employee cells
+                                lines.push(`,,,,${doc.description},${doc.status},${doc.expiryDate || 'Ingen'}`);
+                            }
+                        });
+                    } else {
+                        // Employee with no documents
+                        lines.push(`${emp.name},${emp.role},${emp.phone || ''},${emp.email || ''},Ingen dokumenter,-,-`);
+                    }
+                });
+            } else {
+                lines.push('ANSATTE OG DOKUMENTER');
+                lines.push('Ingen ansatte registrert');
+            }
+            
+            lines.push('');
+            lines.push('STATISTIKK');
+            lines.push(`Totalt antall ansatte,${ue.employees ? ue.employees.length : 0}`);
+            
+            if (ue.employees) {
+                const totalDocs = ue.employees.reduce((sum, emp) => sum + (emp.documents ? emp.documents.length : 0), 0);
+                const okDocs = ue.employees.reduce((sum, emp) => {
+                    return sum + (emp.documents ? emp.documents.filter(d => d.status === 'OK').length : 0);
+                }, 0);
+                const expiredDocs = ue.employees.reduce((sum, emp) => {
+                    return sum + (emp.documents ? emp.documents.filter(d => d.status === 'EXPIRED').length : 0);
+                }, 0);
+                
+                lines.push(`Totalt antall dokumenter,${totalDocs}`);
+                lines.push(`Dokumenter OK,${okDocs}`);
+                lines.push(`Dokumenter utløpt,${expiredDocs}`);
+            }
+            
+            lines.push('');
+            lines.push(`Generert,${new Date().toLocaleString('no-NO')}`);
+            lines.push('Generert av,MESTA Compliance System v2.0');
+            
+            return lines.join('\n');
+        }
+
+        function formatDate() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}${month}${day}`;
+        }
+
+        // Export Overview to Excel
+        function exportOverviewToExcel() {
+            const filteredUEs = getFilteredUEs();
+            
+            if (filteredUEs.length === 0) {
+                alert('Ingen bedrifter å eksportere. Velg en annen kontrakt eller legg til bedrifter.');
+                return;
+            }
+
+            showLoading('Genererer Excel-rapport...');
+
+            setTimeout(() => {
+                const csv = generateOverviewCSV(filteredUEs);
+                
+                // Create blob and download
+                const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement('a');
+                const url = URL.createObjectURL(blob);
+                
+                const filename = currentContractFilter === 'all' 
+                    ? `MESTA_Oversikt_Alle_${formatDate()}.csv`
+                    : `MESTA_Oversikt_${currentContractFilter.replace(/[^a-zA-Z0-9]/g, '_')}_${formatDate()}.csv`;
+                
+                link.setAttribute('href', url);
+                link.setAttribute('download', filename);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                hideLoading();
+                showNotification(`✓ Excel-rapport lastet ned: ${filteredUEs.length} bedrift(er)`, 'success');
+            }, 1000);
+        }
+
+        function generateOverviewCSV(ues) {
+            const lines = [];
+            
+            // Header
+            lines.push('MESTA COMPLIANCE - SAMLET OVERSIKT');
+            lines.push('');
+            lines.push(`Rapport generert: ${new Date().toLocaleString('no-NO')}`);
+            lines.push(`Filter: ${currentContractFilter === 'all' ? 'Alle kontrakter' : currentContractFilter}`);
+            lines.push(`Antall bedrifter: ${ues.length}`);
+            lines.push('');
+            
+            // Summary statistics
+            const totalEmployees = ues.reduce((sum, ue) => sum + (ue.employees ? ue.employees.length : 0), 0);
+            const totalDocs = ues.reduce((sum, ue) => {
+                return sum + (ue.employees ? ue.employees.reduce((empSum, emp) => 
+                    empSum + (emp.documents ? emp.documents.length : 0), 0) : 0);
+            }, 0);
+            const okDocs = ues.reduce((sum, ue) => {
+                return sum + (ue.employees ? ue.employees.reduce((empSum, emp) => 
+                    empSum + (emp.documents ? emp.documents.filter(d => d.status === 'OK').length : 0), 0) : 0);
+            }, 0);
+            const expiredDocs = ues.reduce((sum, ue) => {
+                return sum + (ue.employees ? ue.employees.reduce((empSum, emp) => 
+                    empSum + (emp.documents ? emp.documents.filter(d => d.status === 'EXPIRED').length : 0), 0) : 0);
+            }, 0);
+            const activeUEs = ues.filter(ue => ue.status === 'ACTIVE').length;
+            const blockedUEs = ues.length - activeUEs;
+            
+            lines.push('SAMMENDRAG');
+            lines.push(`Bedrifter totalt,${ues.length}`);
+            lines.push(`Godkjente bedrifter,${activeUEs}`);
+            lines.push(`Sperrede bedrifter,${blockedUEs}`);
+            lines.push(`Totalt ansatte,${totalEmployees}`);
+            lines.push(`Totalt dokumenter,${totalDocs}`);
+            lines.push(`Dokumenter OK,${okDocs}`);
+            lines.push(`Dokumenter utløpt,${expiredDocs}`);
+            lines.push(`Dokumenter mangler,${totalDocs - okDocs - expiredDocs}`);
+            lines.push('');
+            
+            // Main table header
+            lines.push('BEDRIFTSOVERSIKT');
+            lines.push('Bedriftsnavn,Org.nr,Kontrakt,Status,Ansatte,Dokumenter totalt,Dokumenter OK,Dokumenter utløpt,Sist sjekket');
+            
+            // Main table data
+            ues.forEach(ue => {
+                const empCount = ue.employees ? ue.employees.length : 0;
+                const docCount = ue.employees ? ue.employees.reduce((sum, emp) => 
+                    sum + (emp.documents ? emp.documents.length : 0), 0) : 0;
+                const okCount = ue.employees ? ue.employees.reduce((sum, emp) => 
+                    sum + (emp.documents ? emp.documents.filter(d => d.status === 'OK').length : 0), 0) : 0;
+                const expiredCount = ue.employees ? ue.employees.reduce((sum, emp) => 
+                    sum + (emp.documents ? emp.documents.filter(d => d.status === 'EXPIRED').length : 0), 0) : 0;
+                
+                lines.push(`${ue.name},${ue.orgNumber},${ue.contractId},${ue.status === 'ACTIVE' ? 'Godkjent' : 'Sperret'},${empCount},${docCount},${okCount},${expiredCount},${formatTimestamp(ue.lastChecked)}`);
+            });
+            
+            lines.push('');
+            lines.push('');
+            
+            // Detailed compliance checks
+            lines.push('COMPLIANCE-SJEKKER PER BEDRIFT');
+            lines.push('Bedriftsnavn,Sjekk,Status,Tidspunkt');
+            
+            ues.forEach(ue => {
+                if (ue.complianceChecks && ue.complianceChecks.length > 0) {
+                    ue.complianceChecks.forEach((check, index) => {
+                        if (index === 0) {
+                            lines.push(`${ue.name},${check.name},${check.status},${formatTimestamp(check.checkedAt)}`);
+                        } else {
+                            lines.push(`,${check.name},${check.status},${formatTimestamp(check.checkedAt)}`);
+                        }
+                    });
+                } else {
+                    lines.push(`${ue.name},Ingen sjekker,-,-`);
+                }
+            });
+            
+            lines.push('');
+            lines.push('');
+            
+            // Detailed employee list
+            lines.push('ANSATTE OG DOKUMENTER - DETALJERT');
+            lines.push('Bedrift,Ansatt,Stilling,Telefon,E-post,Dokument,Status,Utløpsdato');
+            
+            ues.forEach(ue => {
+                if (ue.employees && ue.employees.length > 0) {
+                    ue.employees.forEach(emp => {
+                        if (emp.documents && emp.documents.length > 0) {
+                            emp.documents.forEach((doc, docIndex) => {
+                                if (docIndex === 0) {
+                                    lines.push(`${ue.name},${emp.name},${emp.role},${emp.phone || ''},${emp.email || ''},${doc.description},${doc.status},${doc.expiryDate || 'Ingen'}`);
+                                } else {
+                                    lines.push(`,,,,,,${doc.description},${doc.status},${doc.expiryDate || 'Ingen'}`);
+                                }
+                            });
+                        } else {
+                            lines.push(`${ue.name},${emp.name},${emp.role},${emp.phone || ''},${emp.email || ''},Ingen dokumenter,-,-`);
+                        }
+                    });
+                } else {
+                    lines.push(`${ue.name},Ingen ansatte,-,-,-,-,-,-`);
+                }
+            });
+            
+            lines.push('');
+            lines.push('');
+            
+            // Document expiry warnings
+            lines.push('ADVARSEL - DOKUMENTER SOM UTLØPER SNART (< 30 DAGER)');
+            lines.push('Bedrift,Ansatt,Dokument,Utløpsdato,Dager igjen');
+            
+            let hasWarnings = false;
+            ues.forEach(ue => {
+                if (ue.employees) {
+                    ue.employees.forEach(emp => {
+                        if (emp.documents) {
+                            emp.documents.forEach(doc => {
+                                if (doc.expiryDate && isExpiringWithin30Days(doc.expiryDate) && doc.status !== 'EXPIRED') {
+                                    const daysLeft = Math.ceil((new Date(doc.expiryDate) - new Date()) / (1000 * 60 * 60 * 24));
+                                    lines.push(`${ue.name},${emp.name},${doc.description},${formatTimestamp(doc.expiryDate)},${daysLeft}`);
+                                    hasWarnings = true;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            
+            if (!hasWarnings) {
+                lines.push('Ingen dokumenter utløper snart');
+            }
+            
+            lines.push('');
+            lines.push('');
+            
+            // Expired documents
+            lines.push('KRITISK - UTLØPTE DOKUMENTER');
+            lines.push('Bedrift,Ansatt,Dokument,Utløpt dato');
+            
+            let hasExpired = false;
+            ues.forEach(ue => {
+                if (ue.employees) {
+                    ue.employees.forEach(emp => {
+                        if (emp.documents) {
+                            emp.documents.forEach(doc => {
+                                if (doc.status === 'EXPIRED') {
+                                    lines.push(`${ue.name},${emp.name},${doc.description},${formatTimestamp(doc.expiryDate)}`);
+                                    hasExpired = true;
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+            
+            if (!hasExpired) {
+                lines.push('Ingen utløpte dokumenter');
+            }
+            
+            lines.push('');
+            lines.push('---');
+            lines.push(`Rapport slutt - Generert av MESTA Compliance System v2.0`);
+            
+            return lines.join('\n');
+        }
+
+        function isExpiringWithin30Days(dateString) {
+            if (!dateString) return false;
+            const expiry = new Date(dateString);
+            const today = new Date();
+            const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
+            return expiry <= thirtyDaysFromNow && expiry > today;
+        }
+
+        // Onboarding Functions
+        let currentOnboardingSlide = 0;
+        const totalOnboardingSlides = 3;
+
+        function showOnboarding() {
+            document.getElementById('onboardingOverlay').style.display = 'flex';
+            document.getElementById('onboardingOverlay').style.position = 'fixed';
+            document.getElementById('onboardingOverlay').style.inset = '0';
+            document.getElementById('onboardingOverlay').style.background = 'linear-gradient(135deg, rgba(0, 75, 135, 0.98) 0%, rgba(0, 51, 102, 0.98) 100%)';
+            document.getElementById('onboardingOverlay').style.zIndex = '10000';
+            document.getElementById('onboardingOverlay').style.alignItems = 'center';
+            document.getElementById('onboardingOverlay').style.justifyContent = 'center';
+            document.getElementById('onboardingOverlay').style.animation = 'fadeIn 0.5s ease-out';
+        }
+
+        function closeOnboarding() {
+            document.getElementById('onboardingOverlay').style.display = 'none';
+        }
+
+        function goToOnboardingSlide(index) {
+            // Hide all slides
+            document.querySelectorAll('.onboarding-slide').forEach(slide => {
+                slide.style.display = 'none';
+            });
+            
+            // Show target slide
+            const slides = document.querySelectorAll('.onboarding-slide');
+            slides[index].style.display = 'flex';
+            slides[index].style.animation = 'slideIn 0.5s ease-out';
+            
+            currentOnboardingSlide = index;
+            
+            // Update dots
+            document.querySelectorAll('.onboarding-dot').forEach((dot, i) => {
+                if (i === index) {
+                    dot.style.background = 'var(--mesta-orange)';
+                    dot.style.width = '32px';
+                    dot.style.borderRadius = '6px';
+                    dot.classList.add('active');
+                } else {
+                    dot.style.background = '#555';
+                    dot.style.width = '12px';
+                    dot.style.borderRadius = '50%';
+                    dot.classList.remove('active');
+                }
+            });
+            
+            // Update buttons
+            document.getElementById('onboardingPrev').disabled = index === 0;
+            if (index === totalOnboardingSlides - 1) {
+                document.getElementById('onboardingNext').style.display = 'none';
+                document.getElementById('onboardingStart').style.display = 'block';
+            } else {
+                document.getElementById('onboardingNext').style.display = 'block';
+                document.getElementById('onboardingStart').style.display = 'none';
+            }
+        }
+
+        function nextOnboardingSlide() {
+            if (currentOnboardingSlide < totalOnboardingSlides - 1) {
+                goToOnboardingSlide(currentOnboardingSlide + 1);
+            }
+        }
+
+        function prevOnboardingSlide() {
+            if (currentOnboardingSlide > 0) {
+                goToOnboardingSlide(currentOnboardingSlide - 1);
+            }
+        }
+
+        function completeOnboardingFlow() {
+            const dontShow = document.getElementById('dontShowAgain').checked;
+            
+            if (dontShow) {
+                localStorage.setItem('onboarding_completed', 'true');
+                localStorage.setItem('onboarding_dont_show', 'true');
+            } else {
+                localStorage.setItem('onboarding_completed', 'true');
+                // Increment view count
+                const viewCount = parseInt(localStorage.getItem('onboarding_view_count') || '0');
+                localStorage.setItem('onboarding_view_count', String(viewCount + 1));
+            }
+            
+            closeOnboarding();
+            showNotification('✅ Velkommen! Du er nå klar til å bruke systemet.', 'success');
+        }
+
+        // Check if onboarding should be shown
+        function checkOnboarding() {
+            const dontShow = localStorage.getItem('onboarding_dont_show');
+            const completed = localStorage.getItem('onboarding_completed');
+            const viewCount = parseInt(localStorage.getItem('onboarding_view_count') || '0');
+            
+            // Show if: not checked "don't show", OR viewed less than 2 times
+            if (dontShow !== 'true' && viewCount < 2) {
+                setTimeout(() => {
+                    showOnboarding();
+                }, 1000);
+            }
+        }
+
+        // Add to settings: Reset onboarding
+        window.resetOnboarding = function() {
+            localStorage.removeItem('onboarding_completed');
+            localStorage.removeItem('onboarding_dont_show');
+            localStorage.removeItem('onboarding_view_count');
+            closeSettingsModal();
+            showOnboarding();
+        };
+
+        // Keyboard shortcuts for onboarding
+        document.addEventListener('keydown', (e) => {
+            const onboardingVisible = document.getElementById('onboardingOverlay').style.display === 'flex';
+            
+            if (onboardingVisible) {
+                if (e.key === 'ArrowRight') {
+                    e.preventDefault();
+                    nextOnboardingSlide();
+                } else if (e.key === 'ArrowLeft') {
+                    e.preventDefault();
+                    prevOnboardingSlide();
+                } else if (e.key === 'Escape') {
+                    e.preventDefault();
+                    if (confirm('Vil du lukke introduksjonen? Du kan se den igjen fra innstillinger.')) {
+                        closeOnboarding();
+                    }
+                }
+            }
+        });
+
+        // Initialize
+        console.log('MESTA Compliance v2 - Ready');
+        console.log('Test users: admin/admin123, prosjektleder/proj123, ue/ue123');
+    </script>
+</body>
+</html>

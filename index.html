@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="no">
 <head>
@@ -1706,32 +1707,105 @@
 
             if (ue.employees) {
                 ue.employees.forEach(emp => {
-                    emp.documents.forEach(doc => {
-                        if (doc.status === 'OK') docsOK++;
-                        else if (doc.status === 'EXPIRED') docsExpired++;
-                        else docsExpiring++;
-                    });
+                    if (emp.documents) {
+                        emp.documents.forEach(doc => {
+                            if (doc.status === 'OK') docsOK++;
+                            else if (doc.status === 'EXPIRED') docsExpired++;
+                            else docsExpiring++;
+                        });
+                    }
                 });
             }
 
-            const employeesHtml = ue.employees ? ue.employees.map(emp => {
-                const docCount = emp.documents.length;
-                const okCount = emp.documents.filter(d => d.status === 'OK').length;
+            // Compliance checks section
+            const complianceHtml = ue.complianceChecks && ue.complianceChecks.length > 0 ? `
+                <div style="background: white; border-radius: 20px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                        <span>📋</span> Påkrevd dokumentasjon fra ${ue.name}
+                    </h3>
+                    <p style="color: #666; margin-bottom: 1.5rem; line-height: 1.6;">
+                        Disse dokumentene må leveres til MESTA for at bedriften skal være godkjent for arbeid:
+                    </p>
+                    <div style="display: grid; gap: 1rem;">
+                        ${ue.complianceChecks.map(check => {
+                            const bgColor = check.status === 'OK' ? '#D1FAE5' : 
+                                          check.status === 'PENDING' ? '#FEF3C7' : '#FEE2E2';
+                            const borderColor = check.status === 'OK' ? 'var(--success)' : 
+                                              check.status === 'PENDING' ? 'var(--yellow)' : 'var(--error)';
+                            const statusMessage = check.status === 'OK' ? '✅ Levert og godkjent' : 
+                                                check.status === 'PENDING' ? '⏳ Mangler - må leveres' : 
+                                                '❌ Utløpt eller avvist';
+                            const badgeClass = check.status === 'OK' ? 'ok' : 
+                                             check.status === 'PENDING' ? 'warning' : 'error';
+                            const badgeText = check.status === 'OK' ? 'OK' : 
+                                            check.status === 'PENDING' ? 'Mangler' : check.status;
+                            
+                            return `
+                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem; background: ${bgColor}; border-radius: 12px; border-left: 4px solid ${borderColor};">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem;">${check.name}</div>
+                                        <div style="font-size: 0.9rem; color: #666;">
+                                            ${statusMessage}
+                                        </div>
+                                        ${check.status !== 'PENDING' ? `
+                                            <div style="font-size: 0.85rem; color: #999; margin-top: 0.25rem;">
+                                                Sjekket: ${formatTimestamp(check.checkedAt)}
+                                            </div>
+                                        ` : ''}
+                                    </div>
+                                    <div class="status-badge ${badgeClass}" style="padding: 0.75rem 1.25rem; font-size: 1rem;">
+                                        ${check.icon} ${badgeText}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                    ${ue.complianceChecks.some(c => c.status === 'PENDING' || c.status === 'EXPIRED') ? `
+                        <div style="background: #FEF3C7; padding: 1.25rem; border-radius: 12px; margin-top: 1.5rem; border-left: 4px solid var(--yellow);">
+                            <div style="font-weight: 700; margin-bottom: 0.5rem; color: #92400E; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.5rem;">⚠️</span>
+                                <span>Handling påkrevd</span>
+                            </div>
+                            <div style="color: #78350F; line-height: 1.6;">
+                                Manglende eller utløpte dokumenter må leveres til MESTA før bedriften kan godkjennes for arbeid. 
+                                Kontakt prosjektleder for mer informasjon om hvordan dokumentene skal leveres.
+                            </div>
+                        </div>
+                    ` : `
+                        <div style="background: #D1FAE5; padding: 1.25rem; border-radius: 12px; margin-top: 1.5rem; border-left: 4px solid var(--success);">
+                            <div style="font-weight: 700; margin-bottom: 0.5rem; color: #065F46; display: flex; align-items: center; gap: 0.5rem;">
+                                <span style="font-size: 1.5rem;">✅</span>
+                                <span>Alt i orden!</span>
+                            </div>
+                            <div style="color: #047857; line-height: 1.6;">
+                                Alle påkrevde dokumenter er levert og godkjent. Bedriften er klar for arbeid.
+                            </div>
+                        </div>
+                    `}
+                </div>
+            ` : '';
+
+            const employeesHtml = ue.employees && ue.employees.length > 0 ? ue.employees.map(emp => {
+                const docCount = emp.documents ? emp.documents.length : 0;
+                const okCount = emp.documents ? emp.documents.filter(d => d.status === 'OK').length : 0;
                 const badgeClass = okCount === docCount ? 'complete' : 'incomplete';
                 const badgeText = okCount === docCount ? `✓ ${docCount} dokumenter OK` : `⚠️ ${docCount - okCount} mangler`;
 
                 return `
-                    <div class="employee-card">
-                        <div class="employee-header">
+                    <div class="employee-card" onclick="viewEmployeeDetailsFromUE('${ue.id}', '${emp.id}')" style="cursor: pointer; transition: all 0.2s;">
+                        <div class="employee-header" style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <div class="employee-name">${emp.name}</div>
                                 <div class="employee-role">${emp.role}</div>
                             </div>
-                            <div class="doc-badge ${badgeClass}">${badgeText}</div>
+                            <div style="display: flex; align-items: center; gap: 1rem;">
+                                <div class="doc-badge ${badgeClass}">${badgeText}</div>
+                                <div style="color: var(--mesta-blue); font-size: 1.5rem;">→</div>
+                            </div>
                         </div>
                     </div>
                 `;
-            }).join('') : '';
+            }).join('') : '<p style="text-align: center; color: #999; padding: 2rem;">Ingen ansatte registrert</p>';
 
             const html = `
                 <div class="status-overview slide-up">
@@ -1763,12 +1837,14 @@
                     </div>
                 </div>
 
+                ${complianceHtml}
+
                 <div class="ue-list slide-up" style="margin-top: 2rem;">
                     <div class="section-header">
                         <span class="section-icon">👥</span>
-                        <h2 class="section-title">Dine ansatte</h2>
+                        <h2 class="section-title">Dine ansatte (${empCount})</h2>
                     </div>
-                    ${employeesHtml || '<p style="text-align: center; color: #999; padding: 2rem;">Ingen ansatte registrert</p>'}
+                    ${employeesHtml}
                 </div>
             `;
             
@@ -1822,7 +1898,8 @@
                 ` : '';
 
                 return `
-                    <div class="employee-card">
+                    <div class="employee-card" onclick="viewEmployeeDetails('${ue.id}', '${emp.id}')" style="cursor: pointer; transition: all 0.2s; position: relative;">
+                        <div style="position: absolute; top: 1rem; right: 1rem; color: var(--mesta-blue); font-size: 1.5rem;">→</div>
                         <div class="employee-header">
                             <div>
                                 <div class="employee-name">${emp.name}</div>
@@ -1867,9 +1944,16 @@
                     ➕ Legg til ansatt
                 </button>
                 
-                <button class="big-button secondary" onclick="exportUEToExcel('${ue.id}')" style="margin-top: 1rem; background: linear-gradient(135deg, var(--mesta-green) 0%, #008C42 100%); color: white;">
-                    📊 Eksporter til Excel
-                </button>
+                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                    <button class="big-button secondary" onclick="exportUEToExcel('${ue.id}')" style="flex: 1; background: linear-gradient(135deg, var(--mesta-green) 0%, #008C42 100%); color: white;">
+                        📊 Eksporter til Excel
+                    </button>
+                    ${CURRENT_USER.role === 'admin' ? `
+                        <button class="big-button secondary" onclick="deleteUE('${ue.id}')" style="flex: 1; background: linear-gradient(135deg, var(--error) 0%, #DC2626 100%); color: white;">
+                            🗑️ Slett bedrift
+                        </button>
+                    ` : ''}
+                </div>
             `;
 
             document.getElementById('ueDetailsTitle').innerHTML = `<span>🏢</span><span>${ue.name}</span>`;
@@ -3125,6 +3209,174 @@ Link: ${window.location.origin}/upload/${uploadToken}
             const today = new Date();
             const thirtyDaysFromNow = new Date(today.getTime() + 30 * 24 * 60 * 60 * 1000);
             return expiry <= thirtyDaysFromNow && expiry > today;
+        }
+
+        // Delete UE function
+        function deleteUE(ueId) {
+            const ue = MOCK_UE_DATABASE.find(u => u.id === ueId);
+            if (!ue) return;
+            
+            const confirmMsg = `⚠️ Er du sikker på at du vil slette denne bedriften?\n\n${ue.name}\nOrg.nr: ${ue.orgNumber}\nKontrakt: ${ue.contractId}\n\nDette kan ikke angres!`;
+            
+            if (!confirm(confirmMsg)) return;
+            
+            // Extra confirmation for safety
+            const doubleConfirm = confirm('⚠️ BEKREFT SLETTING\n\nDette vil permanent slette bedriften og alle ansatte.\n\nKlikk OK for å slette, eller Avbryt for å beholde.');
+            
+            if (!doubleConfirm) return;
+            
+            showLoading('Sletter bedrift...');
+            
+            setTimeout(() => {
+                // Remove from database
+                const index = MOCK_UE_DATABASE.findIndex(u => u.id === ueId);
+                if (index > -1) {
+                    MOCK_UE_DATABASE.splice(index, 1);
+                }
+                
+                hideLoading();
+                closeModal();
+                renderUEList();
+                updateStats();
+                
+                showNotification(`✓ ${ue.name} er slettet`, 'success');
+            }, 1000);
+        }
+
+        // View Employee Details Modal
+        function viewEmployeeDetailsFromUE(ueId, empId) {
+            viewEmployeeDetails(ueId, empId);
+        }
+
+        function viewEmployeeDetails(ueId, empId) {
+            const ue = MOCK_UE_DATABASE.find(u => u.id === ueId);
+            if (!ue) return;
+            
+            const emp = ue.employees.find(e => e.id === empId);
+            if (!emp) return;
+            
+            const modalHtml = `
+                <div class="modal active" id="employeeDetailsModal" onclick="if(event.target === this) closeEmployeeDetailsModal()">
+                    <div class="modal-box" style="max-width: 600px;">
+                        <div class="modal-header">
+                            <h2 style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 2rem;">👤</span>
+                                <span>${emp.name}</span>
+                            </h2>
+                            <button class="close-btn" onclick="closeEmployeeDetailsModal()">✕</button>
+                        </div>
+                        
+                        <div class="modal-body">
+                            <!-- Contact Info -->
+                            <div style="background: var(--mesta-gray); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                                <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 1rem; color: var(--mesta-dark);">
+                                    ${emp.role}
+                                </div>
+                                ${emp.email ? `
+                                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                        <span style="font-size: 1.2rem;">📧</span>
+                                        <a href="mailto:${emp.email}" style="color: var(--mesta-blue); text-decoration: none;">
+                                            ${emp.email}
+                                        </a>
+                                    </div>
+                                ` : ''}
+                                ${emp.phone ? `
+                                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                        <span style="font-size: 1.2rem;">📱</span>
+                                        <a href="tel:${emp.phone}" style="color: var(--mesta-blue); text-decoration: none;">
+                                            ${emp.phone}
+                                        </a>
+                                    </div>
+                                ` : ''}
+                                ${!emp.email && !emp.phone ? `
+                                    <div style="color: #999; font-style: italic;">Ingen kontaktinformasjon registrert</div>
+                                ` : ''}
+                            </div>
+                            
+                            <!-- Documents -->
+                            <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                                <span>📄</span> Dokumenter
+                            </h3>
+                            
+                            ${emp.documents && emp.documents.length > 0 ? `
+                                <div style="display: grid; gap: 1rem;">
+                                    ${emp.documents.map(doc => {
+                                        const bgColor = doc.status === 'OK' ? '#D1FAE5' : 
+                                                      doc.status === 'EXPIRED' ? '#FEE2E2' : '#FEF3C7';
+                                        const borderColor = doc.status === 'OK' ? 'var(--success)' : 
+                                                          doc.status === 'EXPIRED' ? 'var(--error)' : 'var(--yellow)';
+                                        const icon = doc.status === 'OK' ? '✅' : 
+                                                   doc.status === 'EXPIRED' ? '❌' : '⚠️';
+                                        
+                                        // Calculate days until expiry if applicable
+                                        let expiryInfo = '';
+                                        if (doc.expiryDate) {
+                                            const expiry = new Date(doc.expiryDate);
+                                            const today = new Date();
+                                            const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                                            
+                                            if (doc.status === 'OK' && daysLeft < 90) {
+                                                expiryInfo = `<div style="color: #D97706; font-size: 0.9rem; margin-top: 0.25rem;">
+                                                    ⚠️ Utløper om ${daysLeft} dager
+                                                </div>`;
+                                            } else if (doc.status === 'EXPIRED') {
+                                                expiryInfo = `<div style="color: #DC2626; font-size: 0.9rem; margin-top: 0.25rem;">
+                                                    ❌ Utløpt for ${Math.abs(daysLeft)} dager siden
+                                                </div>`;
+                                            }
+                                        }
+                                        
+                                        return `
+                                            <div style="background: ${bgColor}; padding: 1.25rem; border-radius: 12px; border-left: 4px solid ${borderColor};">
+                                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                                    <div style="flex: 1;">
+                                                        <div style="font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">
+                                                            ${doc.description}
+                                                        </div>
+                                                        ${doc.expiryDate ? `
+                                                            <div style="color: #666; font-size: 0.9rem;">
+                                                                Gyldig til: ${formatTimestamp(doc.expiryDate)}
+                                                            </div>
+                                                        ` : `
+                                                            <div style="color: #999; font-size: 0.9rem; font-style: italic;">
+                                                                Ingen utløpsdato
+                                                            </div>
+                                                        `}
+                                                        ${expiryInfo}
+                                                    </div>
+                                                    <div class="status-badge ${doc.status === 'OK' ? 'ok' : doc.status === 'EXPIRED' ? 'error' : 'warning'}" 
+                                                         style="padding: 0.5rem 1rem; margin-left: 1rem;">
+                                                        ${icon} ${doc.status}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        `;
+                                    }).join('')}
+                                </div>
+                            ` : `
+                                <div style="text-align: center; padding: 2rem; background: var(--mesta-gray); border-radius: 12px; color: #999;">
+                                    Ingen dokumenter registrert for denne ansatte
+                                </div>
+                            `}
+                        </div>
+                        
+                        <div style="padding: 1.5rem; border-top: 1px solid #E5E7EB; display: flex; justify-content: flex-end;">
+                            <button class="big-button primary" onclick="closeEmployeeDetailsModal()">
+                                Lukk
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeEmployeeDetailsModal() {
+            const modal = document.getElementById('employeeDetailsModal');
+            if (modal) {
+                modal.remove();
+            }
         }
 
         // Onboarding Functions

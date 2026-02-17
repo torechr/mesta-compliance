@@ -1256,23 +1256,34 @@
                                placeholder="ola@example.com" required>
                     </div>
                     <div class="form-field">
-                        <label class="form-label">📄 Påkrevd dokumentasjon</label>
+                        <label class="form-label">📄 Påkrevd dokumentasjon for ansatt</label>
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 0.75rem;">
+                            Velg persondokumenter som må leveres:
+                        </p>
                         <div class="checkbox-group">
                             <label class="checkbox-item">
                                 <input type="checkbox" name="docType" value="DRIVERS_LICENSE" checked>
-                                <span class="checkbox-label">🚗 Førerkort</span>
+                                <span class="checkbox-label">🪪 Førerkort og førerbevis</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="docType" value="HMS_COURSE" checked>
-                                <span class="checkbox-label">🦺 HMS-opplæring</span>
+                                <input type="checkbox" name="docType" value="ROAD_WORK_COURSE" checked>
+                                <span class="checkbox-label">🚧 Arbeidsvarsling Kurs 1 Arbeid på veg</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="docType" value="MACHINERY_CERT">
-                                <span class="checkbox-label">🚜 Maskinførerbevis</span>
+                                <input type="checkbox" name="docType" value="MESTA_SAFETY_CARD" checked>
+                                <span class="checkbox-label">🦺 Mesta sikkerhetskort</span>
                             </label>
                             <label class="checkbox-item">
-                                <input type="checkbox" name="docType" value="TRADE_CERT">
-                                <span class="checkbox-label">🎓 Fagbrev</span>
+                                <input type="checkbox" name="docType" value="FIRST_AID">
+                                <span class="checkbox-label">🏥 Førstehjelpskurs</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="docType" value="FIRE_FIGHTING">
+                                <span class="checkbox-label">🧯 Brannbekjempelse</span>
+                            </label>
+                            <label class="checkbox-item">
+                                <input type="checkbox" name="docType" value="WINTER_OPERATIONS">
+                                <span class="checkbox-label">❄️ Kompetansetest på vinterdrift</span>
                             </label>
                         </div>
                     </div>
@@ -1387,9 +1398,10 @@
                 status: 'ACTIVE',
                 lastChecked: '2025-02-09T14:30:00Z',
                 complianceChecks: [
-                    { code: 'BRREG_ACTIVE', name: 'Aktivt i Brønnøysund', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' },
+                    { code: 'SHIFT_PLAN', name: 'Skift og beredskapsplan', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' },
                     { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' },
-                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' }
+                    { code: 'INSURANCE_CERTIFICATE', name: 'Forsikringsbevis / yrkesskadeforsikring', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' },
+                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest og fullmakt', status: 'OK', icon: '✓', checkedAt: '2025-02-09T14:30:00Z' }
                 ],
                 employees: [
                     {
@@ -1399,9 +1411,9 @@
                         phone: '+47 900 00 001',
                         email: 'per@bergvesen.no',
                         documents: [
-                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse CE', status: 'OK', expiryDate: '2026-05-15' },
-                            { type: 'MACHINERY_CERT', description: 'Maskinførerbevis', status: 'OK', expiryDate: '2027-03-20' },
-                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'OK', expiryDate: '2026-06-10' }
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort og førerbevis', status: 'OK', expiryDate: '2026-05-15' },
+                            { type: 'ROAD_WORK_COURSE', description: 'Arbeidsvarsling Kurs 1 Arbeid på veg', status: 'OK', expiryDate: '2027-03-20' },
+                            { type: 'MESTA_SAFETY_CARD', description: 'Mesta sikkerhetskort', status: 'OK', expiryDate: '2026-06-10' }
                         ]
                     },
                     {
@@ -1411,9 +1423,9 @@
                         phone: '+47 900 00 002',
                         email: 'kari@bergvesen.no',
                         documents: [
-                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse B', status: 'OK', expiryDate: '2027-02-10' },
-                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'EXPIRED', expiryDate: '2025-01-15' },
-                            { type: 'TRADE_CERT', description: 'Fagbrev', status: 'OK', expiryDate: null }
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort og førerbevis', status: 'OK', expiryDate: '2027-02-10' },
+                            { type: 'MESTA_SAFETY_CARD', description: 'Mesta sikkerhetskort', status: 'EXPIRED', expiryDate: '2025-01-15' },
+                            { type: 'FIRST_AID', description: 'Førstehjelpskurs', status: 'OK', expiryDate: '2026-09-20' }
                         ]
                     }
                 ]
@@ -1426,9 +1438,9 @@
                 status: 'BLOCKED',
                 lastChecked: '2025-02-08T10:15:00Z',
                 complianceChecks: [
-                    { code: 'BRREG_ACTIVE', name: 'Aktivt i Brønnøysund', status: 'OK', icon: '✓', checkedAt: '2025-02-08T10:15:00Z' },
+                    { code: 'SHIFT_PLAN', name: 'Skift og beredskapsplan', status: 'PENDING', icon: '⏳', checkedAt: '2025-02-08T10:15:00Z' },
                     { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', status: 'EXPIRED', icon: '✗', checkedAt: '2025-02-08T10:15:00Z' },
-                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest', status: 'OK', icon: '✓', checkedAt: '2025-02-08T10:15:00Z' }
+                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest og fullmakt', status: 'OK', icon: '✓', checkedAt: '2025-02-08T10:15:00Z' }
                 ],
                 employees: [
                     {
@@ -1438,9 +1450,9 @@
                         phone: '+47 900 00 003',
                         email: 'ole@anleggnord.no',
                         documents: [
-                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse B', status: 'OK', expiryDate: '2027-02-10' },
-                            { type: 'TRADE_CERT', description: 'Fagbrev tømrer', status: 'OK', expiryDate: null },
-                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'OK', expiryDate: '2026-06-18' }
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort og førerbevis', status: 'OK', expiryDate: '2027-02-10' },
+                            { type: 'ROAD_WORK_COURSE', description: 'Arbeidsvarsling Kurs 1 Arbeid på veg', status: 'OK', expiryDate: '2026-08-15' },
+                            { type: 'MESTA_SAFETY_CARD', description: 'Mesta sikkerhetskort', status: 'OK', expiryDate: '2026-06-18' }
                         ]
                     }
                 ]
@@ -1453,9 +1465,11 @@
                 status: 'ACTIVE',
                 lastChecked: '2025-02-07T16:45:00Z',
                 complianceChecks: [
-                    { code: 'BRREG_ACTIVE', name: 'Aktivt i Brønnøysund', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' },
+                    { code: 'SHIFT_PLAN', name: 'Skift og beredskapsplan', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' },
                     { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' },
-                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' }
+                    { code: 'INSURANCE_CERTIFICATE', name: 'Forsikringsbevis / yrkesskadeforsikring', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' },
+                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest og fullmakt', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' },
+                    { code: 'VEHICLE_CARDS', name: 'Vognkort på alle kjøretøy', status: 'OK', icon: '✓', checkedAt: '2025-02-07T16:45:00Z' }
                 ],
                 employees: [
                     {
@@ -1465,8 +1479,9 @@
                         phone: '+47 900 00 004',
                         email: 'lars@asfaltservice.no',
                         documents: [
-                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse C', status: 'OK', expiryDate: '2026-08-20' },
-                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'OK', expiryDate: '2026-09-15' }
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort og førerbevis', status: 'OK', expiryDate: '2026-08-20' },
+                            { type: 'ROAD_WORK_COURSE', description: 'Arbeidsvarsling Kurs 1 Arbeid på veg', status: 'OK', expiryDate: '2026-09-15' },
+                            { type: 'MESTA_SAFETY_CARD', description: 'Mesta sikkerhetskort', status: 'OK', expiryDate: '2027-01-10' }
                         ]
                     },
                     {
@@ -1476,9 +1491,9 @@
                         phone: '+47 900 00 005',
                         email: 'mari@asfaltservice.no',
                         documents: [
-                            { type: 'DRIVERS_LICENSE', description: 'Førerkort klasse CE', status: 'OK', expiryDate: '2027-01-10' },
-                            { type: 'MACHINERY_CERT', description: 'Maskinførerbevis', status: 'OK', expiryDate: '2026-11-30' },
-                            { type: 'HMS_COURSE', description: 'HMS-opplæring', status: 'OK', expiryDate: '2026-07-22' }
+                            { type: 'DRIVERS_LICENSE', description: 'Førerkort og førerbevis', status: 'OK', expiryDate: '2027-01-10' },
+                            { type: 'WINTER_OPERATIONS', description: 'Kompetansetest på vinterdrift', status: 'OK', expiryDate: '2026-11-30' },
+                            { type: 'MESTA_SAFETY_CARD', description: 'Mesta sikkerhetskort', status: 'OK', expiryDate: '2026-07-22' }
                         ]
                     }
                 ]
@@ -2035,32 +2050,40 @@
                 <div class="form-field">
                     <label class="form-label">📄 Påkrevd dokumentasjon</label>
                     <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
-                        Velg hvilke dokumenter bedriften må levere:
+                        Velg hvilke organisasjonsdokumenter bedriften må levere:
                     </p>
                     <div class="checkbox-group">
                         <label class="checkbox-item">
-                            <input type="checkbox" name="manualDocType" value="TAX_CERTIFICATE" checked>
-                            <span class="checkbox-label"><strong>🧾 Skatteattest</strong></span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="manualDocType" value="VAT_CERTIFICATE" checked>
-                            <span class="checkbox-label"><strong>💰 MVA-attest</strong></span>
+                            <input type="checkbox" name="manualDocType" value="SHIFT_PLAN" checked>
+                            <span class="checkbox-label"><strong>📋 Skift og beredskapsplan</strong></span>
                         </label>
                         <label class="checkbox-item">
                             <input type="checkbox" name="manualDocType" value="HMS_DECLARATION" checked>
                             <span class="checkbox-label"><strong>🦺 HMS-egenerklæring</strong></span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="checkbox" name="manualDocType" value="INSURANCE_CERTIFICATE">
+                            <input type="checkbox" name="manualDocType" value="INSURANCE_CERTIFICATE" checked>
                             <span class="checkbox-label"><strong>🛡️ Forsikringsbevis</strong></span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="checkbox" name="manualDocType" value="EMPLOYEE_LIST">
-                            <span class="checkbox-label"><strong>👥 Ansatteliste</strong></span>
+                            <input type="checkbox" name="manualDocType" value="TAX_CERTIFICATE" checked>
+                            <span class="checkbox-label"><strong>🧾 Skatteattest</strong></span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="checkbox" name="manualDocType" value="QUALITY_CERTIFICATE">
-                            <span class="checkbox-label"><strong>⭐ Kvalitetssertifikat</strong></span>
+                            <input type="checkbox" name="manualDocType" value="INTAKE_FORM">
+                            <span class="checkbox-label"><strong>📝 Inntakskontrollskjema</strong></span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="VEHICLE_CARDS">
+                            <span class="checkbox-label"><strong>🚛 Vognkort</strong></span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="WHEEL_LOADER_CERT">
+                            <span class="checkbox-label"><strong>🚜 Hjullaster maskinførerbevis</strong></span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="manualDocType" value="STARTBANK_ID">
+                            <span class="checkbox-label"><strong>🔐 StartBANK-ID</strong></span>
                         </label>
                     </div>
                 </div>
@@ -2468,21 +2491,14 @@
                 <div class="form-field">
                     <label class="form-label">📄 Påkrevd dokumentasjon for bedriften</label>
                     <p style="color: #666; font-size: 0.9rem; margin-bottom: 1rem;">
-                        Velg hvilke dokumenter bedriften må levere for å være i compliance:
+                        Velg hvilke organisasjonsdokumenter bedriften må levere:
                     </p>
                     <div class="checkbox-group">
                         <label class="checkbox-item">
-                            <input type="checkbox" name="ueDocType" value="TAX_CERTIFICATE" checked>
+                            <input type="checkbox" name="ueDocType" value="SHIFT_PLAN" checked>
                             <span class="checkbox-label">
-                                <strong>🧾 Skatteattest</strong><br>
-                                <small style="color: #666;">Bevis på innbetalt skatt</small>
-                            </span>
-                        </label>
-                        <label class="checkbox-item">
-                            <input type="checkbox" name="ueDocType" value="VAT_CERTIFICATE" checked>
-                            <span class="checkbox-label">
-                                <strong>💰 MVA-attest</strong><br>
-                                <small style="color: #666;">Merverdiavgift i orden</small>
+                                <strong>📋 Skift og beredskapsplan</strong><br>
+                                <small style="color: #666;">Plan for bemanning og beredskap</small>
                             </span>
                         </label>
                         <label class="checkbox-item">
@@ -2493,38 +2509,59 @@
                             </span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="checkbox" name="ueDocType" value="INSURANCE_CERTIFICATE">
+                            <input type="checkbox" name="ueDocType" value="INSURANCE_CERTIFICATE" checked>
                             <span class="checkbox-label">
-                                <strong>🛡️ Forsikringsbevis</strong><br>
+                                <strong>🛡️ Forsikringsbevis / yrkesskadeforsikring</strong><br>
                                 <small style="color: #666;">Ansvars- og yrkesskadeforsikring</small>
                             </span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="checkbox" name="ueDocType" value="EMPLOYEE_LIST">
+                            <input type="checkbox" name="ueDocType" value="TAX_CERTIFICATE" checked>
                             <span class="checkbox-label">
-                                <strong>👥 Ansatteliste</strong><br>
-                                <small style="color: #666;">Oversikt over ansatte på prosjekt</small>
+                                <strong>🧾 Skatteattest og fullmakt</strong><br>
+                                <small style="color: #666;">For innhenting av utvidet skatteattest</small>
                             </span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="checkbox" name="ueDocType" value="QUALITY_CERTIFICATE">
+                            <input type="checkbox" name="ueDocType" value="INTAKE_FORM">
                             <span class="checkbox-label">
-                                <strong>⭐ Kvalitetssertifikat</strong><br>
-                                <small style="color: #666;">ISO eller tilsvarende</small>
+                                <strong>📝 Inntakskontrollskjema</strong><br>
+                                <small style="color: #666;">Erklæring ved bruk av underentreprenør</small>
                             </span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="checkbox" name="ueDocType" value="ENVIRONMENTAL_CERTIFICATE">
+                            <input type="checkbox" name="ueDocType" value="VEHICLE_CARDS">
                             <span class="checkbox-label">
-                                <strong>🌱 Miljøsertifikat</strong><br>
-                                <small style="color: #666;">Miljøledelsessystem</small>
+                                <strong>🚛 Vognkort på alle kjøretøy</strong><br>
+                                <small style="color: #666;">Registreringsbevis for kjøretøy</small>
                             </span>
                         </label>
                         <label class="checkbox-item">
-                            <input type="checkbox" name="ueDocType" value="AUTHORIZATION">
+                            <input type="checkbox" name="ueDocType" value="VEHICLE_DISPENSATION">
                             <span class="checkbox-label">
-                                <strong>📜 Sentral godkjenning</strong><br>
-                                <small style="color: #666;">For spesielle bransjer</small>
+                                <strong>📏 Dispensasjon kjøretøy</strong><br>
+                                <small style="color: #666;">For kjøretøy med særlig bredde</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="VEHICLE_PERMIT">
+                            <span class="checkbox-label">
+                                <strong>📄 Løyvedokument på kjøretøy</strong><br>
+                                <small style="color: #666;">Ved bruk til annet enn vinterdrift</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="WHEEL_LOADER_CERT">
+                            <span class="checkbox-label">
+                                <strong>🚜 Hjullaster maskinførerbevis</strong><br>
+                                <small style="color: #666;">Inkl. samsvarsdokument + årlig kontroll</small>
+                            </span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="ueDocType" value="STARTBANK_ID">
+                            <span class="checkbox-label">
+                                <strong>🔐 StartBANK-ID</strong><br>
+                                <small style="color: #666;">Digital identifikasjon</small>
                             </span>
                         </label>
                     </div>
@@ -2693,16 +2730,31 @@ Link: ${window.location.origin}/upload/${uploadToken}
 
         function getDocumentDisplayName(docType) {
             const names = {
-                // Employee documents
-                'DRIVERS_LICENSE': 'Førerkort',
-                'HMS_COURSE': 'HMS-opplæring',
+                // Person documents
+                'DRIVERS_LICENSE': 'Førerkort og førerbevis',
+                'ROAD_WORK_COURSE': 'Arbeidsvarsling Kurs 1 Arbeid på veg',
+                'MESTA_SAFETY_CARD': 'Mesta sikkerhetskort, grunnleggende sikkerhetsopplæring',
+                'FIRST_AID': 'Førstehjelpskurs',
+                'FIRE_FIGHTING': 'Brannbekjempelse',
+                'WINTER_OPERATIONS': 'Kompetansetest på vinterdrift',
+                
+                // Organization documents
+                'SHIFT_PLAN': 'Skift og beredskapsplan',
+                'HMS_DECLARATION': 'HMS-egenerklæring',
+                'INSURANCE_CERTIFICATE': 'Forsikringsbevis / yrkesskadeforsikring',
+                'TAX_CERTIFICATE': 'Skatteattest og fullmakt for innhenting av utvidet skatteattest',
+                'INTAKE_FORM': 'Inntakskontrollskjema – erklæring ved bruk av underentreprenør',
+                'VEHICLE_CARDS': 'Vognkort på alle kjøretøy',
+                'VEHICLE_DISPENSATION': 'Dispensasjon kjøretøy (særlig bredde)',
+                'VEHICLE_PERMIT': 'Løyvedokument på kjøretøy – om kjøretøy brukes til annet enn vinterdrift',
+                'WHEEL_LOADER_CERT': 'Hjullaster maskinførerbevis / samsvarsdokument på tilleggsutstyr + årlig kontroll',
+                'STARTBANK_ID': 'StartBANK-ID',
+                
+                // Legacy (for backwards compatibility)
                 'MACHINERY_CERT': 'Maskinførerbevis',
                 'TRADE_CERT': 'Fagbrev',
-                // Company documents
-                'TAX_CERTIFICATE': 'Skatteattest',
+                'HMS_COURSE': 'HMS-opplæring',
                 'VAT_CERTIFICATE': 'MVA-attest',
-                'HMS_DECLARATION': 'HMS-egenerklæring',
-                'INSURANCE_CERTIFICATE': 'Forsikringsbevis',
                 'EMPLOYEE_LIST': 'Ansatteliste',
                 'QUALITY_CERTIFICATE': 'Kvalitetssertifikat',
                 'ENVIRONMENTAL_CERTIFICATE': 'Miljøsertifikat',

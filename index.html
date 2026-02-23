@@ -1095,7 +1095,7 @@
                             <div class="status-number" id="statBlocked" style="-webkit-text-fill-color: var(--error);">2</div>
                             <div class="status-label">Sperret</div>
                         </div>
-                        <div class="status-item">
+                        <div class="status-item" onclick="showEmployeeReport()" style="cursor: pointer; transition: all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
                             <div class="status-number" id="statEmployees">10</div>
                             <div class="status-label">Ansatte totalt</div>
                         </div>
@@ -1298,6 +1298,27 @@
                     <button type="submit" class="big-button primary">📤 Send SMS og legg til</button>
                     <button type="button" class="big-button secondary" onclick="closeEmployeeModal()" style="margin-top: 1rem;">Avbryt</button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Employee Report Modal -->
+    <div class="modal" id="employeeReportModal">
+        <div class="modal-box" style="max-width: 1200px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <span>👥</span>
+                    <span>Ansattrapport</span>
+                </h2>
+                <button class="close-btn" onclick="closeEmployeeReportModal()">✕</button>
+            </div>
+            <div class="modal-body" id="employeeReportContent" style="overflow-y: auto; flex: 1;">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div style="padding: 1.5rem; border-top: 1px solid #E5E7EB; background: white; border-radius: 0 0 20px 20px;">
+                <button class="big-button primary" onclick="closeEmployeeReportModal()" style="width: 100%;">
+                    Lukk
+                </button>
             </div>
         </div>
     </div>
@@ -3544,6 +3565,477 @@ Mvh MESTA
                 // Refresh the modal
                 closeEmployeeDetailsModal();
                 setTimeout(() => viewEmployeeDetails(ueId, empId), 100);
+            }, 1500);
+        }
+
+        // Employee Report Functions
+        function showEmployeeReport() {
+            const filteredUEs = getFilteredUEs();
+            
+            // Collect all employees
+            let allEmployees = [];
+            filteredUEs.forEach(ue => {
+                if (ue.employees && ue.employees.length > 0) {
+                    ue.employees.forEach(emp => {
+                        allEmployees.push({
+                            ...emp,
+                            companyName: ue.name,
+                            companyOrgNr: ue.orgNumber,
+                            contractId: ue.contractId
+                        });
+                    });
+                }
+            });
+            
+            if (allEmployees.length === 0) {
+                alert('Ingen ansatte registrert');
+                return;
+            }
+            
+            // Calculate totals
+            let totalDocs = 0;
+            let okDocs = 0;
+            let missingDocs = 0;
+            let expiredDocs = 0;
+            let expiringSoonDocs = 0;
+            
+            allEmployees.forEach(emp => {
+                if (emp.documents) {
+                    emp.documents.forEach(doc => {
+                        totalDocs++;
+                        if (doc.status === 'OK') {
+                            // Check if expiring soon
+                            if (doc.expiryDate) {
+                                const expiry = new Date(doc.expiryDate);
+                                const today = new Date();
+                                const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                                
+                                if (daysLeft <= 30 && daysLeft > 0) {
+                                    expiringSoonDocs++;
+                                } else {
+                                    okDocs++;
+                                }
+                            } else {
+                                okDocs++;
+                            }
+                        } else if (doc.status === 'EXPIRED') {
+                            expiredDocs++;
+                        } else {
+                            missingDocs++;
+                        }
+                    });
+                }
+            });
+            
+            // Build report HTML
+            const reportHtml = `
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Oversikt</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        <div style="background: linear-gradient(135deg, var(--mesta-blue) 0%, #003366 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 800;">${allEmployees.length}</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;">Ansatte totalt</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, var(--success) 0%, #059669 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 800;">${okDocs}</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;">Dokumenter OK</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #F59E0B 0%, #D97706 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 800;">${expiringSoonDocs}</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;">Utgår om ≤30 dager</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, var(--error) 0%, #DC2626 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 800;">${expiredDocs}</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;">Utgått</div>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #6B7280 0%, #4B5563 100%); color: white; padding: 1.5rem; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 2rem; font-weight: 800;">${missingDocs}</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;">Ikke lastet opp</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; gap: 1rem;">
+                    <h3 style="font-size: 1.3rem; font-weight: 700;">Detaljert oversikt (${allEmployees.length} ansatte)</h3>
+                    <div style="display: flex; gap: 0.75rem;">
+                        <button class="big-button secondary" onclick="sendBulkDocumentReminders()" style="background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%); color: white;">
+                            📱 Send purring på SMS
+                        </button>
+                        <button class="big-button secondary" onclick="exportEmployeeReport()" style="background: linear-gradient(135deg, var(--mesta-green) 0%, #008C42 100%); color: white;">
+                            📊 Eksporter til Excel
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="display: grid; gap: 1rem;">
+                    ${allEmployees.map(emp => {
+                        const docCount = emp.documents ? emp.documents.length : 0;
+                        const okCount = emp.documents ? emp.documents.filter(d => {
+                            if (d.status !== 'OK') return false;
+                            if (!d.expiryDate) return true;
+                            const expiry = new Date(d.expiryDate);
+                            const today = new Date();
+                            const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                            return daysLeft > 30;
+                        }).length : 0;
+                        const expiringSoon = emp.documents ? emp.documents.filter(d => {
+                            if (d.status !== 'OK' || !d.expiryDate) return false;
+                            const expiry = new Date(d.expiryDate);
+                            const today = new Date();
+                            const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                            return daysLeft <= 30 && daysLeft > 0;
+                        }).length : 0;
+                        const expired = emp.documents ? emp.documents.filter(d => d.status === 'EXPIRED').length : 0;
+                        const missing = emp.documents ? emp.documents.filter(d => d.status === 'MISSING').length : 0;
+                        
+                        return `
+                            <div style="background: white; border: 1px solid #E5E7EB; border-radius: 12px; padding: 1.5rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                    <div style="flex: 1;">
+                                        <h4 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;">${emp.name}</h4>
+                                        <div style="color: #666; font-size: 0.9rem; margin-bottom: 0.5rem;">${emp.role}</div>
+                                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem; color: #666;">
+                                            <span>🏢 ${emp.companyName}</span>
+                                            <span>📋 ${emp.contractId}</span>
+                                            ${emp.phone ? `<span>📱 ${emp.phone}</span>` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: flex-end;">
+                                        ${okCount > 0 ? `<span class="status-badge ok" style="font-size: 0.85rem;">${okCount} OK</span>` : ''}
+                                        ${expiringSoon > 0 ? `<span class="status-badge warning" style="font-size: 0.85rem;">${expiringSoon} utgår snart</span>` : ''}
+                                        ${expired > 0 ? `<span class="status-badge error" style="font-size: 0.85rem;">${expired} utgått</span>` : ''}
+                                        ${missing > 0 ? `<span style="background: #6B7280; color: white; padding: 0.375rem 0.75rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600;">${missing} ikke lastet opp</span>` : ''}
+                                    </div>
+                                </div>
+                                
+                                ${emp.documents && emp.documents.length > 0 ? `
+                                    <div style="display: grid; gap: 0.5rem; margin-top: 1rem;">
+                                        ${emp.documents.map(doc => {
+                                            let statusText = 'Ikke lastet opp';
+                                            let statusColor = '#6B7280';
+                                            let statusBg = '#F3F4F6';
+                                            
+                                            if (doc.status === 'OK') {
+                                                if (doc.expiryDate) {
+                                                    const expiry = new Date(doc.expiryDate);
+                                                    const today = new Date();
+                                                    const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                                                    
+                                                    if (daysLeft <= 30 && daysLeft > 0) {
+                                                        statusText = `Utgår om ${daysLeft} dager`;
+                                                        statusColor = '#D97706';
+                                                        statusBg = '#FEF3C7';
+                                                    } else {
+                                                        statusText = 'OK';
+                                                        statusColor = 'var(--success)';
+                                                        statusBg = '#D1FAE5';
+                                                    }
+                                                } else {
+                                                    statusText = 'OK';
+                                                    statusColor = 'var(--success)';
+                                                    statusBg = '#D1FAE5';
+                                                }
+                                            } else if (doc.status === 'EXPIRED') {
+                                                if (doc.expiryDate) {
+                                                    const expiry = new Date(doc.expiryDate);
+                                                    const today = new Date();
+                                                    const daysAgo = Math.abs(Math.ceil((expiry - today) / (1000 * 60 * 60 * 24)));
+                                                    statusText = `Utgått for ${daysAgo} dager siden`;
+                                                } else {
+                                                    statusText = 'Utgått';
+                                                }
+                                                statusColor = 'var(--error)';
+                                                statusBg = '#FEE2E2';
+                                            }
+                                            
+                                            return `
+                                                <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: ${statusBg}; border-radius: 8px; border-left: 3px solid ${statusColor};">
+                                                    <span style="font-size: 0.9rem; font-weight: 500;">${doc.description}</span>
+                                                    <span style="color: ${statusColor}; font-size: 0.85rem; font-weight: 600;">${statusText}</span>
+                                                </div>
+                                            `;
+                                        }).join('')}
+                                    </div>
+                                ` : '<div style="color: #999; font-style: italic; text-align: center; padding: 1rem;">Ingen dokumenter registrert</div>'}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+            
+            document.getElementById('employeeReportContent').innerHTML = reportHtml;
+            document.getElementById('employeeReportModal').classList.add('active');
+        }
+
+        function closeEmployeeReportModal() {
+            document.getElementById('employeeReportModal').classList.remove('active');
+        }
+
+        function exportEmployeeReport() {
+            const filteredUEs = getFilteredUEs();
+            
+            // Collect all employees
+            let allEmployees = [];
+            filteredUEs.forEach(ue => {
+                if (ue.employees && ue.employees.length > 0) {
+                    ue.employees.forEach(emp => {
+                        allEmployees.push({
+                            ...emp,
+                            companyName: ue.name,
+                            companyOrgNr: ue.orgNumber,
+                            contractId: ue.contractId
+                        });
+                    });
+                }
+            });
+            
+            const lines = [];
+            const BOM = '\uFEFF';
+            
+            // Header
+            lines.push('ANSATTRAPPORT');
+            lines.push(`Generert: ${formatTimestamp(new Date().toISOString())}`);
+            lines.push(`Antall ansatte: ${allEmployees.length}`);
+            lines.push('');
+            
+            // Detailed list
+            lines.push('DETALJERT OVERSIKT');
+            lines.push('Navn,Stilling,Bedrift,Kontrakt,Telefon,E-post,Dokument,Status,Gyldig til,Dager til utløp');
+            
+            allEmployees.forEach(emp => {
+                if (emp.documents && emp.documents.length > 0) {
+                    emp.documents.forEach(doc => {
+                        let statusText = 'Ikke lastet opp';
+                        let daysLeft = '';
+                        
+                        if (doc.status === 'OK') {
+                            if (doc.expiryDate) {
+                                const expiry = new Date(doc.expiryDate);
+                                const today = new Date();
+                                const days = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                                daysLeft = days;
+                                
+                                if (days <= 30 && days > 0) {
+                                    statusText = `Utgår snart (${days} dager)`;
+                                } else {
+                                    statusText = 'OK';
+                                }
+                            } else {
+                                statusText = 'OK';
+                            }
+                        } else if (doc.status === 'EXPIRED') {
+                            statusText = 'Utgått';
+                            if (doc.expiryDate) {
+                                const expiry = new Date(doc.expiryDate);
+                                const today = new Date();
+                                const days = Math.ceil((today - expiry) / (1000 * 60 * 60 * 24));
+                                daysLeft = `-${days}`;
+                            }
+                        }
+                        
+                        lines.push(`${emp.name},${emp.role},${emp.companyName},${emp.contractId},${emp.phone || ''},${emp.email || ''},${doc.description},${statusText},${doc.expiryDate ? formatTimestamp(doc.expiryDate) : 'Ingen'},${daysLeft}`);
+                    });
+                } else {
+                    lines.push(`${emp.name},${emp.role},${emp.companyName},${emp.contractId},${emp.phone || ''},${emp.email || ''},,Ingen dokumenter,,`);
+                }
+            });
+            
+            const csvContent = BOM + lines.join('\n');
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const filename = `MESTA_Ansattrapport_${new Date().toISOString().split('T')[0].replace(/-/g, '')}.csv`;
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('✅ Ansattrapport eksportert', 'success');
+        }
+
+        // Send bulk SMS reminders for all problematic documents
+        function sendBulkDocumentReminders() {
+            const filteredUEs = getFilteredUEs();
+            
+            // Collect all employees with problematic documents
+            let employeesWithIssues = [];
+            
+            filteredUEs.forEach(ue => {
+                if (ue.employees && ue.employees.length > 0) {
+                    ue.employees.forEach(emp => {
+                        if (emp.documents && emp.documents.length > 0) {
+                            const problematicDocs = emp.documents.filter(doc => {
+                                if (doc.status === 'EXPIRED' || doc.status === 'MISSING') {
+                                    return true;
+                                }
+                                // Check if expiring within 30 days
+                                if (doc.status === 'OK' && doc.expiryDate) {
+                                    const expiry = new Date(doc.expiryDate);
+                                    const today = new Date();
+                                    const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                                    return daysLeft <= 30 && daysLeft > 0;
+                                }
+                                return false;
+                            });
+                            
+                            if (problematicDocs.length > 0) {
+                                employeesWithIssues.push({
+                                    employee: emp,
+                                    company: ue,
+                                    problematicDocs: problematicDocs
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+            
+            if (employeesWithIssues.length === 0) {
+                alert('✅ Ingen ansatte har manglende, utgåtte eller snart utgående dokumenter!\n\nAlle dokumenter er i orden.');
+                return;
+            }
+            
+            // Count total problematic documents
+            const totalDocs = employeesWithIssues.reduce((sum, item) => sum + item.problematicDocs.length, 0);
+            
+            // Build confirmation message
+            let confirmMsg = `📱 Send SMS-purring til ${employeesWithIssues.length} ansatt(e)?\n\n`;
+            confirmMsg += `Totalt ${totalDocs} dokument(er) som trenger oppfølging:\n\n`;
+            
+            // Group by status
+            let expired = 0, missing = 0, expiringSoon = 0;
+            
+            employeesWithIssues.forEach(item => {
+                item.problematicDocs.forEach(doc => {
+                    if (doc.status === 'EXPIRED') {
+                        expired++;
+                    } else if (doc.status === 'MISSING') {
+                        missing++;
+                    } else {
+                        expiringSoon++;
+                    }
+                });
+            });
+            
+            if (expired > 0) confirmMsg += `❌ ${expired} utgått\n`;
+            if (expiringSoon > 0) confirmMsg += `⚠️ ${expiringSoon} utgår snart (≤30 dager)\n`;
+            if (missing > 0) confirmMsg += `⏳ ${missing} ikke lastet opp\n`;
+            
+            confirmMsg += '\nAnsatte som får SMS:\n';
+            employeesWithIssues.slice(0, 5).forEach(item => {
+                confirmMsg += `• ${item.employee.name} (${item.problematicDocs.length} dok.)\n`;
+            });
+            
+            if (employeesWithIssues.length > 5) {
+                confirmMsg += `... og ${employeesWithIssues.length - 5} til\n`;
+            }
+            
+            if (!confirm(confirmMsg)) return;
+            
+            showLoading(`Sender SMS til ${employeesWithIssues.length} ansatte...`);
+            
+            setTimeout(() => {
+                let sentCount = 0;
+                const results = [];
+                
+                employeesWithIssues.forEach(item => {
+                    const emp = item.employee;
+                    const ue = item.company;
+                    const docs = item.problematicDocs;
+                    
+                    const uploadToken = Math.random().toString(36).substring(2, 15);
+                    const uploadUrl = `${window.location.origin}/upload/${uploadToken}`;
+                    
+                    // Build document list for SMS
+                    let docList = '';
+                    docs.forEach((doc, index) => {
+                        let status = '';
+                        if (doc.status === 'EXPIRED') {
+                            status = '(utgått)';
+                        } else if (doc.status === 'MISSING') {
+                            status = '(mangler)';
+                        } else if (doc.expiryDate) {
+                            const expiry = new Date(doc.expiryDate);
+                            const today = new Date();
+                            const daysLeft = Math.ceil((expiry - today) / (1000 * 60 * 60 * 24));
+                            status = `(utgår om ${daysLeft} dager)`;
+                        }
+                        docList += `${index + 1}. ${doc.description} ${status}\n`;
+                    });
+                    
+                    // Log SMS (in production, this would send actual SMS)
+                    const smsContent = `
+=== SMS PURRING SENDT ===
+Til: ${emp.phone}
+Navn: ${emp.name}
+Bedrift: ${ue.name}
+
+Melding:
+Hei ${emp.name}!
+
+Du har ${docs.length} dokument(er) som trenger oppfølging:
+
+${docList}
+Vennligst last opp dokumentene her:
+${uploadUrl}
+
+Mvh MESTA
+=========================
+`;
+                    console.log(smsContent);
+                    
+                    results.push({
+                        name: emp.name,
+                        phone: emp.phone,
+                        docCount: docs.length,
+                        token: uploadToken
+                    });
+                    
+                    // Store in pending documents
+                    if (!PENDING_DOCUMENTS[emp.id]) {
+                        PENDING_DOCUMENTS[emp.id] = {
+                            employee: emp,
+                            requiredDocs: [],
+                            uploadToken: uploadToken,
+                            sentAt: new Date().toISOString(),
+                            status: 'REMINDER_SENT'
+                        };
+                    }
+                    
+                    PENDING_DOCUMENTS[emp.id].status = 'REMINDER_SENT';
+                    PENDING_DOCUMENTS[emp.id].lastReminder = new Date().toISOString();
+                    PENDING_DOCUMENTS[emp.id].bulkReminder = true;
+                    
+                    sentCount++;
+                });
+                
+                hideLoading();
+                
+                // Show summary
+                let summaryMsg = `✅ SMS-purring sendt til ${sentCount} ansatt(e)!\n\n`;
+                summaryMsg += `Totalt ${totalDocs} dokument(er) som må følges opp.\n\n`;
+                summaryMsg += 'Se console for detaljer om alle SMS-meldinger.';
+                
+                alert(summaryMsg);
+                showNotification(`✅ ${sentCount} SMS sendt`, 'success');
+                
+                // Log summary to console
+                console.log(`
+=== OPPSUMMERING: SMS-PURRING ===
+Sendt til: ${sentCount} ansatte
+Totalt dokumenter: ${totalDocs}
+- Utgått: ${expired}
+- Utgår snart: ${expiringSoon}
+- Ikke lastet opp: ${missing}
+
+Mottakere:
+${results.map((r, i) => `${i+1}. ${r.name} - ${r.phone} (${r.docCount} dok.)`).join('\n')}
+=================================
+                `);
             }, 1500);
         }
 

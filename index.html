@@ -1088,6 +1088,10 @@
                             <div class="status-label">Godkjente</div>
                         </div>
                         <div class="status-item">
+                            <div class="status-number" id="statPending" style="-webkit-text-fill-color: #D97706;">0</div>
+                            <div class="status-label">Under innhenting</div>
+                        </div>
+                        <div class="status-item">
                             <div class="status-number" id="statBlocked" style="-webkit-text-fill-color: var(--error);">2</div>
                             <div class="status-label">Sperret</div>
                         </div>
@@ -1274,6 +1278,10 @@
                                 <span class="checkbox-label">🦺 Mesta sikkerhetskort</span>
                             </label>
                             <label class="checkbox-item">
+                                <input type="checkbox" name="docType" value="HMS_CARD" checked>
+                                <span class="checkbox-label">🎫 HMS-kort</span>
+                            </label>
+                            <label class="checkbox-item">
                                 <input type="checkbox" name="docType" value="FIRST_AID">
                                 <span class="checkbox-label">🏥 Førstehjelpskurs</span>
                             </label>
@@ -1435,12 +1443,12 @@
                 name: 'Anlegg Nord AS',
                 orgNumber: '876543210',
                 contractId: 'FV12-2025-MESTA',
-                status: 'BLOCKED',
+                status: 'PENDING',
                 lastChecked: '2025-02-08T10:15:00Z',
                 complianceChecks: [
                     { code: 'SHIFT_PLAN', name: 'Skift og beredskapsplan', status: 'PENDING', icon: '⏳', checkedAt: '2025-02-08T10:15:00Z' },
-                    { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', status: 'EXPIRED', icon: '✗', checkedAt: '2025-02-08T10:15:00Z' },
-                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest og fullmakt', status: 'OK', icon: '✓', checkedAt: '2025-02-08T10:15:00Z' }
+                    { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', status: 'PENDING', icon: '⏳', checkedAt: '2025-02-08T10:15:00Z' },
+                    { code: 'TAX_CERTIFICATE', name: 'Skatteattest og fullmakt', status: 'PENDING', icon: '⏳', checkedAt: '2025-02-08T10:15:00Z' }
                 ],
                 employees: [
                     {
@@ -1670,8 +1678,18 @@
             
             const html = filteredUEs.map(ue => {
                 const empCount = ue.employees ? ue.employees.length : 0;
-                const statusClass = ue.status === 'ACTIVE' ? 'ok' : 'error';
-                const statusText = ue.status === 'ACTIVE' ? '✓ Godkjent' : '✗ Sperret';
+                let statusClass, statusText;
+                
+                if (ue.status === 'ACTIVE') {
+                    statusClass = 'ok';
+                    statusText = '✓ Godkjent';
+                } else if (ue.status === 'PENDING') {
+                    statusClass = 'warning';
+                    statusText = '⏳ Under innhenting';
+                } else {
+                    statusClass = 'error';
+                    statusText = '✗ Sperret';
+                }
                 
                 return `
                     <div class="list-item" onclick="viewUEDetails('${ue.id}')">
@@ -1699,11 +1717,13 @@
             const filteredUEs = getFilteredUEs();
             const total = filteredUEs.length;
             const active = filteredUEs.filter(ue => ue.status === 'ACTIVE').length;
-            const blocked = total - active;
+            const pending = filteredUEs.filter(ue => ue.status === 'PENDING').length;
+            const blocked = filteredUEs.filter(ue => ue.status === 'BLOCKED').length;
             const employees = filteredUEs.reduce((sum, ue) => sum + (ue.employees ? ue.employees.length : 0), 0);
             
             document.getElementById('statTotal').textContent = total;
             document.getElementById('statActive').textContent = active;
+            document.getElementById('statPending').textContent = pending;
             document.getElementById('statBlocked').textContent = blocked;
             document.getElementById('statEmployees').textContent = employees;
         }
@@ -1764,7 +1784,7 @@
                                         </div>
                                         ${check.status !== 'PENDING' ? `
                                             <div style="font-size: 0.85rem; color: #999; margin-top: 0.25rem;">
-                                                Sjekket: ${formatTimestamp(check.checkedAt)}
+                                                Siste import: ${formatTimestamp(check.checkedAt)}
                                             </div>
                                         ` : ''}
                                     </div>
@@ -1828,8 +1848,16 @@
                         <span class="section-icon">🏢</span>
                         <h2 class="section-title">${ue.name}</h2>
                     </div>
-                    <div class="status-badge ${ue.status === 'ACTIVE' ? 'ok' : 'error'}" style="display: inline-block; margin-bottom: 2rem;">
-                        ${ue.status === 'ACTIVE' ? '✓ Din bedrift er godkjent' : '✗ Din bedrift er sperret'}
+                    <div class="status-badge ${
+                        ue.status === 'ACTIVE' ? 'ok' : 
+                        ue.status === 'PENDING' ? 'warning' : 
+                        'error'
+                    }" style="display: inline-block; margin-bottom: 2rem;">
+                        ${
+                            ue.status === 'ACTIVE' ? '✓ Din bedrift er godkjent' : 
+                            ue.status === 'PENDING' ? '⏳ Din bedrift er under innhenting' : 
+                            '✗ Din bedrift er sperret'
+                        }
                     </div>
 
                     <div class="status-grid">
@@ -1881,7 +1909,7 @@
                     <div>
                         <div style="font-weight: 700; margin-bottom: 0.25rem;">${check.name}</div>
                         <div style="font-size: 0.85rem; color: #666;">
-                            ${check.status === 'PENDING' ? 'Venter på dokumentasjon' : `Sjekket: ${formatTimestamp(check.checkedAt)}`}
+                            ${check.status === 'PENDING' ? 'Venter på dokumentasjon' : `Siste import: ${formatTimestamp(check.checkedAt)}`}
                         </div>
                     </div>
                     <div class="status-badge ${check.status === 'OK' ? 'ok' : (check.status === 'PENDING' ? 'warning' : 'error')}" style="padding: 0.5rem 1rem;">
@@ -1932,15 +1960,23 @@
             }).join('') : '<p style="text-align: center; color: #999; padding: 2rem;">Ingen ansatte registrert</p>';
 
             const content = `
-                <div class="status-badge ${ue.status === 'ACTIVE' ? 'ok' : 'error'}" style="margin-bottom: 1.5rem;">
-                    ${ue.status === 'ACTIVE' ? '✓ Godkjent' : '✗ Sperret'}
+                <div class="status-badge ${
+                    ue.status === 'ACTIVE' ? 'ok' : 
+                    ue.status === 'PENDING' ? 'warning' : 
+                    'error'
+                }" style="margin-bottom: 1.5rem;">
+                    ${
+                        ue.status === 'ACTIVE' ? '✓ Godkjent' : 
+                        ue.status === 'PENDING' ? '⏳ Under innhenting' : 
+                        '✗ Sperret'
+                    }
                 </div>
                 
                 <div style="display: grid; gap: 1rem; margin-bottom: 2rem; background: var(--mesta-gray); padding: 1.5rem; border-radius: 16px;">
                     <div><strong>Organisasjonsnummer:</strong> ${ue.orgNumber}</div>
                     <div><strong>Kontrakt:</strong> ${ue.contractId}</div>
                     <div><strong>Ansatte:</strong> ${empCount}</div>
-                    <div><strong>Sist sjekket:</strong> ${formatTimestamp(ue.lastChecked)}</div>
+                    <div><strong>Siste import:</strong> ${formatTimestamp(ue.lastChecked)}</div>
                 </div>
 
                 <h3 style="font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
@@ -2734,6 +2770,7 @@ Link: ${window.location.origin}/upload/${uploadToken}
                 'DRIVERS_LICENSE': 'Førerkort og førerbevis',
                 'ROAD_WORK_COURSE': 'Arbeidsvarsling Kurs 1 Arbeid på veg',
                 'MESTA_SAFETY_CARD': 'Mesta sikkerhetskort, grunnleggende sikkerhetsopplæring',
+                'HMS_CARD': 'HMS-kort',
                 'FIRST_AID': 'Førstehjelpskurs',
                 'FIRE_FIGHTING': 'Brannbekjempelse',
                 'WINTER_OPERATIONS': 'Kompetansetest på vinterdrift',
@@ -2981,8 +3018,12 @@ Link: ${window.location.origin}/upload/${uploadToken}
             lines.push(`Navn,${ue.name}`);
             lines.push(`Organisasjonsnummer,${ue.orgNumber}`);
             lines.push(`Kontrakt-ID,${ue.contractId}`);
-            lines.push(`Status,${ue.status === 'ACTIVE' ? 'Godkjent' : 'Sperret'}`);
-            lines.push(`Sist sjekket,${formatTimestamp(ue.lastChecked)}`);
+            lines.push(`Status,${
+                ue.status === 'ACTIVE' ? 'Godkjent' : 
+                ue.status === 'PENDING' ? 'Under innhenting' : 
+                'Sperret'
+            }`);
+            lines.push(`Siste import,${formatTimestamp(ue.lastChecked)}`);
             lines.push('');
             
             // Compliance checks
@@ -3130,7 +3171,7 @@ Link: ${window.location.origin}/upload/${uploadToken}
             
             // Main table header
             lines.push('BEDRIFTSOVERSIKT');
-            lines.push('Bedriftsnavn,Org.nr,Kontrakt,Status,Ansatte,Dokumenter totalt,Dokumenter OK,Dokumenter utløpt,Sist sjekket');
+            lines.push('Bedriftsnavn,Org.nr,Kontrakt,Status,Ansatte,Dokumenter totalt,Dokumenter OK,Dokumenter utløpt,Siste import');
             
             // Main table data
             ues.forEach(ue => {
@@ -3142,7 +3183,11 @@ Link: ${window.location.origin}/upload/${uploadToken}
                 const expiredCount = ue.employees ? ue.employees.reduce((sum, emp) => 
                     sum + (emp.documents ? emp.documents.filter(d => d.status === 'EXPIRED').length : 0), 0) : 0;
                 
-                lines.push(`${ue.name},${ue.orgNumber},${ue.contractId},${ue.status === 'ACTIVE' ? 'Godkjent' : 'Sperret'},${empCount},${docCount},${okCount},${expiredCount},${formatTimestamp(ue.lastChecked)}`);
+                lines.push(`${ue.name},${ue.orgNumber},${ue.contractId},${
+                    ue.status === 'ACTIVE' ? 'Godkjent' : 
+                    ue.status === 'PENDING' ? 'Under innhenting' : 
+                    'Sperret'
+                },${empCount},${docCount},${okCount},${expiredCount},${formatTimestamp(ue.lastChecked)}`);
             });
             
             lines.push('');

@@ -3446,6 +3446,14 @@ Link: ${window.location.origin}/upload/${uploadToken}
                                                         ${icon} ${doc.status}
                                                     </div>
                                                 </div>
+                                                ${doc.status !== 'OK' ? `
+                                                    <button 
+                                                        class="big-button secondary" 
+                                                        onclick="sendDocumentReminder('${ueId}', '${empId}', '${doc.type}', '${doc.description}')"
+                                                        style="width: 100%; margin-top: 1rem; background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%); color: white; font-size: 0.9rem; padding: 0.75rem;">
+                                                        📱 Send SMS for innhenting
+                                                    </button>
+                                                ` : ''}
                                             </div>
                                         `;
                                     }).join('')}
@@ -3474,6 +3482,69 @@ Link: ${window.location.origin}/upload/${uploadToken}
             if (modal) {
                 modal.remove();
             }
+        }
+
+        // Send SMS reminder for specific document
+        function sendDocumentReminder(ueId, empId, docType, docDescription) {
+            const ue = MOCK_UE_DATABASE.find(u => u.id === ueId);
+            if (!ue) return;
+            
+            const emp = ue.employees.find(e => e.id === empId);
+            if (!emp) return;
+            
+            const confirmMsg = `Send SMS-påminnelse til ${emp.name}?\n\nDokument: ${docDescription}\nTelefon: ${emp.phone}`;
+            
+            if (!confirm(confirmMsg)) return;
+            
+            showLoading('Sender SMS...');
+            
+            setTimeout(() => {
+                const uploadToken = Math.random().toString(36).substring(2, 15);
+                const uploadUrl = `${window.location.origin}/upload/${uploadToken}`;
+                
+                // Log SMS (in production, this would send actual SMS)
+                console.log(`
+=== SMS PÅMINNELSE SENDT ===
+Til: ${emp.phone}
+Navn: ${emp.name}
+Bedrift: ${ue.name}
+
+Melding:
+Hei ${emp.name}!
+
+Du mangler følgende dokument:
+📄 ${docDescription}
+
+Vennligst last opp dokumentet her:
+${uploadUrl}
+
+Mvh MESTA
+============================
+                `);
+                
+                // Store in pending documents
+                if (!PENDING_DOCUMENTS[empId]) {
+                    PENDING_DOCUMENTS[empId] = {
+                        employee: emp,
+                        requiredDocs: [],
+                        uploadToken: uploadToken,
+                        sentAt: new Date().toISOString(),
+                        status: 'REMINDER_SENT'
+                    };
+                }
+                
+                PENDING_DOCUMENTS[empId].status = 'REMINDER_SENT';
+                PENDING_DOCUMENTS[empId].lastReminder = new Date().toISOString();
+                PENDING_DOCUMENTS[empId].lastReminderDoc = docDescription;
+                
+                hideLoading();
+                
+                showNotification(`✅ SMS-påminnelse sendt til ${emp.name}`, 'success');
+                
+                // Refresh the modal
+                closeEmployeeDetailsModal();
+                setTimeout(() => viewEmployeeDetails(ueId, empId), 100);
+            }, 1500);
         }
 
         // Onboarding Functions

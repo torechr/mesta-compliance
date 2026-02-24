@@ -1302,6 +1302,24 @@
         </div>
     </div>
 
+    <!-- Edit Document Requirements Modal -->
+    <div class="modal" id="editRequirementsModal">
+        <div class="modal-box" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <span>✏️</span>
+                    <span>Rediger dokumentkrav</span>
+                </h2>
+                <button class="close-btn" onclick="closeEditRequirementsModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div id="editRequirementsContent">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Employee Report Modal -->
     <div class="modal" id="employeeReportModal">
         <div class="modal-box" style="max-width: 1200px; max-height: 90vh; display: flex; flex-direction: column;">
@@ -2016,12 +2034,17 @@
                     ➕ Legg til ansatt
                 </button>
                 
-                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
-                    <button class="big-button secondary" onclick="exportUEToExcel('${ue.id}')" style="flex: 1; background: linear-gradient(135deg, var(--mesta-green) 0%, #008C42 100%); color: white;">
+                <div style="display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap;">
+                    ${CURRENT_USER.role === 'admin' ? `
+                        <button class="big-button secondary" onclick="openEditRequirementsModal('${ue.id}')" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, var(--mesta-orange) 0%, #E55A2B 100%); color: white;">
+                            ✏️ Rediger dokumentkrav
+                        </button>
+                    ` : ''}
+                    <button class="big-button secondary" onclick="exportUEToExcel('${ue.id}')" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, var(--mesta-green) 0%, #008C42 100%); color: white;">
                         📊 Eksporter til Excel
                     </button>
                     ${CURRENT_USER.role === 'admin' ? `
-                        <button class="big-button secondary" onclick="deleteUE('${ue.id}')" style="flex: 1; background: linear-gradient(135deg, var(--error) 0%, #DC2626 100%); color: white;">
+                        <button class="big-button secondary" onclick="deleteUE('${ue.id}')" style="flex: 1; min-width: 200px; background: linear-gradient(135deg, var(--error) 0%, #DC2626 100%); color: white;">
                             🗑️ Slett bedrift
                         </button>
                     ` : ''}
@@ -3364,6 +3387,162 @@ Link: ${window.location.origin}/upload/${uploadToken}
         // View Employee Details Modal
         function viewEmployeeDetailsFromUE(ueId, empId) {
             viewEmployeeDetails(ueId, empId);
+        }
+
+        // Edit Document Requirements
+        function openEditRequirementsModal(ueId) {
+            const ue = MOCK_UE_DATABASE.find(u => u.id === ueId);
+            if (!ue) return;
+            
+            // All available organization document types
+            const allOrgDocuments = [
+                { code: 'SHIFT_PLAN', name: 'Skift og beredskapsplan', icon: '📋' },
+                { code: 'HMS_DECLARATION', name: 'HMS-egenerklæring', icon: '🦺' },
+                { code: 'INSURANCE_CERTIFICATE', name: 'Forsikringsbevis / yrkesskadeforsikring', icon: '🛡️' },
+                { code: 'TAX_CERTIFICATE', name: 'Skatteattest og fullmakt', icon: '🧾' },
+                { code: 'INTAKE_FORM', name: 'Inntakskontrollskjema', icon: '📝' },
+                { code: 'VEHICLE_CARDS', name: 'Vognkort på alle kjøretøy', icon: '🚛' },
+                { code: 'VEHICLE_DISPENSATION', name: 'Dispensasjon kjøretøy', icon: '📏' },
+                { code: 'VEHICLE_PERMIT', name: 'Løyvedokument på kjøretøy', icon: '📄' },
+                { code: 'WHEEL_LOADER_CERT', name: 'Hjullaster maskinførerbevis', icon: '🚜' },
+                { code: 'STARTBANK_ID', name: 'StartBANK-ID', icon: '🔐' }
+            ];
+            
+            // Get current requirements
+            const currentRequirements = ue.complianceChecks ? ue.complianceChecks.map(c => c.code) : [];
+            
+            const content = `
+                <div style="margin-bottom: 1.5rem;">
+                    <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.5rem;">${ue.name}</h3>
+                    <div style="color: #666; font-size: 0.9rem;">
+                        Org.nr: ${ue.orgNumber} | Kontrakt: ${ue.contractId}
+                    </div>
+                </div>
+                
+                <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">ℹ️ Om dokumentkrav</div>
+                    <div style="font-size: 0.9rem; color: #666;">
+                        • Velg hvilke dokumenter bedriften må levere<br>
+                        • Eksisterende dokumenter påvirkes ikke<br>
+                        • Nye krav vil vises som "Venter på dokumentasjon"
+                    </div>
+                </div>
+                
+                <form id="editRequirementsForm">
+                    <div class="form-field">
+                        <label class="form-label">📄 Påkrevd dokumentasjon for bedriften</label>
+                        <div class="checkbox-group" style="max-height: 400px; overflow-y: auto;">
+                            ${allOrgDocuments.map(doc => `
+                                <label class="checkbox-item">
+                                    <input type="checkbox" 
+                                           name="docRequirement" 
+                                           value="${doc.code}" 
+                                           ${currentRequirements.includes(doc.code) ? 'checked' : ''}>
+                                    <span class="checkbox-label">
+                                        <strong>${doc.icon} ${doc.name}</strong>
+                                    </span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="button" class="big-button secondary" onclick="closeEditRequirementsModal()" style="flex: 1;">
+                            Avbryt
+                        </button>
+                        <button type="submit" class="big-button primary" style="flex: 1;">
+                            💾 Lagre endringer
+                        </button>
+                    </div>
+                </form>
+            `;
+            
+            document.getElementById('editRequirementsContent').innerHTML = content;
+            
+            // Add form submit handler
+            document.getElementById('editRequirementsForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveDocumentRequirements(ueId);
+            });
+            
+            document.getElementById('editRequirementsModal').classList.add('active');
+        }
+
+        function closeEditRequirementsModal() {
+            document.getElementById('editRequirementsModal').classList.remove('active');
+        }
+
+        function saveDocumentRequirements(ueId) {
+            const ue = MOCK_UE_DATABASE.find(u => u.id === ueId);
+            if (!ue) return;
+            
+            // Get selected requirements
+            const selectedDocs = Array.from(
+                document.querySelectorAll('input[name="docRequirement"]:checked')
+            ).map(cb => cb.value);
+            
+            if (selectedDocs.length === 0) {
+                alert('⚠️ Du må velge minst ett dokumentkrav');
+                return;
+            }
+            
+            showLoading('Lagrer endringer...');
+            
+            setTimeout(() => {
+                // Update compliance checks
+                const newComplianceChecks = selectedDocs.map(docCode => {
+                    // Check if already exists
+                    const existing = ue.complianceChecks ? ue.complianceChecks.find(c => c.code === docCode) : null;
+                    
+                    if (existing) {
+                        // Keep existing
+                        return existing;
+                    } else {
+                        // Create new (status PENDING)
+                        return {
+                            code: docCode,
+                            name: getDocumentDisplayName(docCode),
+                            status: 'PENDING',
+                            icon: '⏳',
+                            checkedAt: new Date().toISOString()
+                        };
+                    }
+                });
+                
+                // Update UE
+                ue.complianceChecks = newComplianceChecks;
+                
+                // Update UE status based on compliance
+                const hasAnyPending = newComplianceChecks.some(c => c.status === 'PENDING');
+                const hasAnyExpired = newComplianceChecks.some(c => c.status === 'EXPIRED');
+                
+                if (hasAnyExpired) {
+                    ue.status = 'BLOCKED';
+                } else if (hasAnyPending) {
+                    ue.status = 'PENDING';
+                } else {
+                    ue.status = 'ACTIVE';
+                }
+                
+                hideLoading();
+                closeEditRequirementsModal();
+                
+                // Refresh everything
+                renderUEList(); // Update main list
+                updateStats(); // Update statistics
+                viewUEDetails(ueId); // Refresh details view
+                
+                showNotification(`✅ Dokumentkrav oppdatert for ${ue.name}`, 'success');
+                
+                console.log(`
+=== DOKUMENTKRAV OPPDATERT ===
+Bedrift: ${ue.name}
+Ny status: ${ue.status}
+Antall dokumenter: ${selectedDocs.length}
+Dokumenter: ${selectedDocs.map(d => getDocumentDisplayName(d)).join(', ')}
+===============================
+                `);
+            }, 1000);
         }
 
         function viewEmployeeDetails(ueId, empId) {
